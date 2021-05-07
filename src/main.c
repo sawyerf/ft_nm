@@ -50,12 +50,41 @@ typedef struct	s_elf
 
 }				t_elf;
 
+
+void	print_self(char *all, t_elf elf, Elf64_Shdr *shdr, int len)
+{
+	char *str;
+
+	str = all + shdr[elf.ehdr.e_shstrndx].sh_offset;
+	for (int i = 0; i < len; i++)
+	{
+		//printf("======== name =======\n");
+			//print_hex((unsigned char *)all + shdr[i].sh_offset, shdr[i].sh_size);
+		// printf("yyyyyyyyyy  : %d\n",    i);
+		if (shdr[i].sh_type == 11)
+		{
+			printf("======== Shdr =======\n");
+			printf("name        : %s\n",    str + shdr[i].sh_name);
+			printf("sh_name     : 0x%d\n",	shdr[i].sh_name);
+			printf("sh_type     : %d\n",    shdr[i].sh_type);
+			printf("sh_flags    : %ld\n",   shdr[i].sh_flags);
+			printf("sh_addr     : 0x%ld\n", shdr[i].sh_addr);
+			printf("sh_offset   : 0x%ld\n", shdr[i].sh_offset);
+			printf("sh_size     : %ld\n",   shdr[i].sh_size);
+			printf("sh_link     : 0x%d\n",  shdr[i].sh_link);
+			printf("sh_info     : 0x%d\n",  shdr[i].sh_info);
+			printf("sh_addralign: 0x%ld\n", shdr[i].sh_addralign);
+			printf("sh_entsize  : 0x%ld\n", shdr[i].sh_entsize);
+			
+		}
+	}
+}
+
 int main(int argi, char **argv)
 {
 	int fd;
 	struct stat st;
 	t_elf		elf;
-	Elf64_Shdr	shdr;
 	(void)argi;
 
 	if ((fd = open(argv[1], O_RDONLY)) < 0)
@@ -68,30 +97,5 @@ int main(int argi, char **argv)
 	print_elf(elf.ehdr);
 	print_pelf(elf.phdr);
 	read(fd, all + sizeof(elf), st.st_size - sizeof(elf));
-	// for (long unsigned int i = elf.ehdr.e_shoff; i < elf.ehdr.e_shoff + sizeof(shdr) * 11; i += sizeof(shdr))
-	int y = 0;
-	for (long int i = elf.ehdr.e_shoff; i < st.st_size; i += sizeof(shdr))
-	{
-		y += 1;
-		memcpy(&shdr, all + i, sizeof(shdr));
-		printf("======== Shdr =======\n");
-		
-		//print_hex((unsigned char *)&all[i], sizeof(shdr));
-		printf("======== name =======\n");
-		print_hex((unsigned char *)all + shdr.sh_offset, shdr.sh_size);
-		printf("yyyyyyyyyy  : %d\n",    y);
-		printf("addrrrrrrr  : 0x%lx\n", i);
-		printf("sh_name     : 0x%d\n",	shdr.sh_name);
-		printf("sh_type     : %d\n",    shdr.sh_type);
-		printf("sh_flags    : %ld\n",   shdr.sh_flags);
-		printf("sh_addr     : 0x%ld\n", shdr.sh_addr);
-		printf("sh_offset   : 0x%ld\n", shdr.sh_offset);
-		printf("sh_size     : %ld\n",   shdr.sh_size);
-		printf("sh_link     : 0x%d\n",  shdr.sh_link);
-		printf("sh_info     : 0x%d\n",  shdr.sh_info);
-		printf("sh_addralign: 0x%ld\n", shdr.sh_addralign);
-		printf("sh_entsize  : 0x%ld\n", shdr.sh_entsize);
-	}
+	print_self(all, elf, (Elf64_Shdr*)(all + elf.ehdr.e_shoff), (st.st_size - elf.ehdr.e_shoff) / sizeof(Elf64_Shdr));
 }
-	// print_hex((unsigned char *)all, st.st_size);
-
