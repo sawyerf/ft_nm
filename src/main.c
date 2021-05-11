@@ -8,14 +8,57 @@
 #include <string.h>
 #include "libft.h"
 
+char            symbol(Elf64_Sym sym, Elf64_Shdr *shdr)
+{
+  char  c;
+
+  if (ELF64_ST_BIND(sym.st_info) == STB_GNU_UNIQUE)
+    c = 'u';
+  else if (ELF64_ST_BIND(sym.st_info) == STB_WEAK)
+    {
+      c = 'W';
+      if (sym.st_shndx == SHN_UNDEF)
+        c = 'w';
+    }
+  else if (ELF64_ST_BIND(sym.st_info) == STB_WEAK && ELF64_ST_TYPE(sym.st_info) == STT_OBJECT)
+    {
+      c = 'V';
+      if (sym.st_shndx == SHN_UNDEF)
+        c = 'v';
+    }
+  else if (sym.st_shndx == SHN_UNDEF)
+    c = 'U';
+  else if (sym.st_shndx == SHN_ABS)
+    c = 'A';
+  else if (sym.st_shndx == SHN_COMMON)
+    c = 'C';
+  else if (shdr[sym.st_shndx].sh_type == SHT_NOBITS
+       && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
+    c = 'B';
+  else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
+       && shdr[sym.st_shndx].sh_flags == SHF_ALLOC)
+    c = 'R';
+  else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
+       && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
+    c = 'D';
+  else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
+       && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_EXECINSTR))
+    c = 'T';
+  else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC)
+    c = 'D';
+  else
+    c = '?';
+  if (ELF64_ST_BIND(sym.st_info) == STB_LOCAL && c != '?')
+    c += 32;
+  return c;
+}
 
 void	print_elf(Elf64_Ehdr elf)
 {
 	if (elf.e_ident[EI_CLASS] == ELFCLASS32)
-  		printf("32bit\n");
+		printf("32bit\n");
 	if (elf.e_ident[EI_CLASS] == ELFCLASS64)
-  		printf("64bit\n");
-	// print_hex((unsigned char*)&elf, sizeof(elf));
+		printf("64bit\n");
 	printf("======== Ehdr =======\n");
 	printf("e_indent : %s\n", elf.e_ident);
 	printf("e_indent4: %d\n", elf.e_ident[EI_CLASS]);
@@ -50,87 +93,69 @@ typedef struct	s_elf
 
 }				t_elf;
 
+void	print_oself(char *str, Elf64_Shdr shdr)
+{
+	printf("======== Shdr =======\n");
+	printf("name        : %s\n",    str + shdr.sh_name);
+	printf("sh_type     : %d\n",    shdr.sh_type);
+	printf("sh_name     : 0x%d\n",	shdr.sh_name);
+	printf("sh_type     : %d\n",    shdr.sh_type);
+	printf("sh_flags    : %ld\n",   shdr.sh_flags);
+	printf("sh_addr     : 0x%ld\n", shdr.sh_addr);
+	printf("sh_offset   : 0x%ld\n", shdr.sh_offset);
+	printf("sh_size     : %ld\n",   shdr.sh_size / sizeof(Elf64_Sym));
+	printf("sh_link     : 0x%d\n",  shdr.sh_link);
+	printf("sh_info     : 0x%d\n",  shdr.sh_info);
+	printf("sh_addralign: 0x%ld\n", shdr.sh_addralign);
+	printf("sh_entsize  : 0x%ld\n", shdr.sh_entsize);
+}
+
+void	print_sym(char *all, char *sstr, Elf64_Sym sym)
+{
+	printf("======== ST =======\n");
+	printf("nameee  : %s\n",    sstr + sym.st_name);
+	printf("st_name : 0x%d\n",  sym.st_name);
+	printf("st_info : %d\n", ELF64_ST_TYPE(sym.st_info));
+	printf("st_other: %c\n",    sym.st_other);
+	printf("st_shndx: %s\n",    all + sym.st_shndx);
+	printf("st_shndx: %d\n",    sym.st_shndx);
+	printf("st_value: 0x%ld\n", sym.st_value);
+	printf("st_value: %s\n", all + sym.st_value + sym.st_shndx);
+	printf("st_size : 0x%ld\n", sym.st_size);
+}
+
 void	print_self(char *all, t_elf elf, Elf64_Shdr *shdr, int len)
 {
-	char *str;
-	char *sstr;
-	Elf64_Sym *sym;
+	char		*str;
+	char		*sstr;
+	Elf64_Sym	*sym;
+	int			len_sym;
 
 	str = all + shdr[elf.ehdr.e_shstrndx].sh_offset;
 	(void)str;
 	sstr = all + shdr[elf.ehdr.e_shstrndx - 1].sh_offset;
-	// print_hex((unsigned char *)sstr, 300);
 	for (int i = 0; i < len; i++)
 	{
-		// print_hex((unsigned char *)all + shdr[i].sh_offset, shdr[i].sh_size);
-		// printf("yyyyyyyyyy  : %d\n",    i);
-		// printf("======== Shdr =======\n");
-		// printf("name        : %s\n",    str + shdr[i].sh_name);
-		// printf("sh_type     : %d\n",    shdr[i].sh_type);
-		// printf("sh_addr     : 0x%ld\n", shdr[i].sh_addr);
-		// printf("sh_offset   : 0x%ld\n", shdr[i].sh_offset);
 		if (shdr[i].sh_type == 2)
 		{
-			// printf("======== Shdr =======\n");
-			// printf("name        : %s\n",    str + shdr[i].sh_name);
-			// printf("sh_type     : %d\n",    shdr[i].sh_type);
-			// printf("sh_name     : 0x%d\n",	shdr[i].sh_name);
-			// printf("sh_type     : %d\n",    shdr[i].sh_type);
-			// printf("sh_flags    : %ld\n",   shdr[i].sh_flags);
-			// printf("sh_addr     : 0x%ld\n", shdr[i].sh_addr);
-			// printf("sh_offset   : 0x%ld\n", shdr[i].sh_offset);
-			// printf("sh_size     : %ld\n",   shdr[i].sh_size);
-			// printf("sh_link     : 0x%d\n",  shdr[i].sh_link);
-			// printf("sh_info     : 0x%d\n",  shdr[i].sh_info);
-			// printf("sh_addralign: 0x%ld\n", shdr[i].sh_addralign);
-			// printf("sh_entsize  : 0x%ld\n", shdr[i].sh_entsize);
+			// print_oself(str, shdr[i]);
 			sym = (Elf64_Sym*)(all + shdr[i].sh_offset);
+			len_sym = shdr[i].sh_size / sizeof(Elf64_Sym);
 		}
 	}
 	int ttype;
-	for (int y = 0; y < 213; y++)
+	for (int y = 0; y < len_sym; y++)
 	{
-		char type[20][20] = {
-			"NOTYPE",
-			"OBJECT",
-			"FUNC",
-			"SECTION",
-			"FILE",
-			"COMMON",
-			"TLS",
-			"NUM",
-			"LOOS",
-			"GNU_IFUNC",
-			"HIOS",
-			"LOPROC",
-			"HIPROC"
-		};
-		char bind[20][20];
-		ft_strcpy(bind[STB_LOCAL],      "LOCAL");
-		ft_strcpy(bind[STB_GLOBAL],     "GLOBAL");
-		ft_strcpy(bind[STB_WEAK],       "WEAK");
-		ft_strcpy(bind[STB_NUM],        "NUM");
-		ft_strcpy(bind[STB_LOOS],       "LOOS");
-		ft_strcpy(bind[STB_GNU_UNIQUE], "GNU_UNIQUE");
-		ft_strcpy(bind[STB_HIOS],       "HIOS");
-		ft_strcpy(bind[STB_LOPROC],     "LOPROC");
-		ft_strcpy(bind[STB_HIPROC],     "HIPROC");
-
-		(void)sym;
 		ttype = ELF64_ST_TYPE(sym[y].st_info);
-		if (ttype != 0 && ttype != 4 && ttype != 3)
+		if (ttype != 4 && ttype != 3)
 		{
-			printf("%.16lx %-10s %-10s %s\n", sym[y].st_value, bind[ELF64_ST_BIND(sym[y].st_info)], type[ELF64_ST_TYPE(sym[y].st_info)], sstr + sym[y].st_name);
-			//printf("======== ST =======\n");
-			// printf("nameee  : %s\n",    sstr + sym[y].st_name);
-			// printf("st_name : 0x%d\n",  sym[y].st_name);
-			// printf("st_info : %d %d\n",    y, ELF64_ST_TYPE(sym[y].st_info));
-			// printf("st_info : %s\n",    bind[ELF64_ST_BIND(sym[y].st_info)]);
-			// printf("st_other: %c\n",    sym[y].st_other);
-			// printf("st_shndx: %s\n",    all + sym[y].st_shndx);
-			// printf("st_value: 0x%ld\n", sym[y].st_value);
-			// printf("st_size : 0x%ld\n", sym[y].st_size);
+			if (sym[y].st_value)
+				printf("%.16lx %c %s\n", sym[y].st_value, symbol(sym[y], shdr), sstr + sym[y].st_name);
+			else
+				printf("%16c %c %s\n", ' ', symbol(sym[y], shdr), sstr + sym[y].st_name);
 		}
+		// else
+		// 		printf("%16d %c %s\n", ttype, symbol(sym[y], shdr), sstr + sym[y].st_name);
 	}
 }
 
@@ -146,7 +171,7 @@ int main(int argi, char **argv)
 	if (fstat(fd, &st) < 0)
 		return 1;
 	char	 all[st.st_size + 1];
-	printf("size: %ld\n", st.st_size);
+	// printf("size: %ld\n", st.st_size);
 	read(fd, &elf, sizeof(t_elf));
 	// print_elf(elf.ehdr);
 	// print_pelf(elf.phdr);
