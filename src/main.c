@@ -8,49 +8,55 @@
 #include <string.h>
 #include "libft.h"
 
-char            symbol(Elf64_Sym sym, Elf64_Shdr *shdr)
+void	print_oself(char *str, Elf64_Shdr shdr);
+char	symbol(char *str, Elf64_Sym sym, Elf64_Shdr *shdr)
 {
-  char  c;
-
-  if (ELF64_ST_BIND(sym.st_info) == STB_GNU_UNIQUE)
-    c = 'u';
-  else if (ELF64_ST_BIND(sym.st_info) == STB_WEAK)
-    {
-      c = 'W';
-      if (sym.st_shndx == SHN_UNDEF)
-        c = 'w';
-    }
-  else if (ELF64_ST_BIND(sym.st_info) == STB_WEAK && ELF64_ST_TYPE(sym.st_info) == STT_OBJECT)
-    {
-      c = 'V';
-      if (sym.st_shndx == SHN_UNDEF)
-        c = 'v';
-    }
-  else if (sym.st_shndx == SHN_UNDEF)
-    c = 'U';
-  else if (sym.st_shndx == SHN_ABS)
-    c = 'A';
-  else if (sym.st_shndx == SHN_COMMON)
-    c = 'C';
-  else if (shdr[sym.st_shndx].sh_type == SHT_NOBITS
-       && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
-    c = 'B';
-  else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
-       && shdr[sym.st_shndx].sh_flags == SHF_ALLOC)
-    c = 'R';
-  else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
-       && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
-    c = 'D';
-  else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS
-       && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_EXECINSTR))
-    c = 'T';
-  else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC)
-    c = 'D';
-  else
-    c = '?';
-  if (ELF64_ST_BIND(sym.st_info) == STB_LOCAL && c != '?')
-    c += 32;
-  return c;
+	char	c;
+	
+	//printf("st_shndx: %d\n", sym.st_shndx);
+	if (sym.st_shndx > 0 && sym.st_shndx < 32)
+	{
+		// printf("type: %d\n", shdr[sym.st_shndx].sh_type);
+		//printf("name        : %s\n",    str + shdr[sym.st_shndx].sh_name);
+	}
+	if (ELF64_ST_BIND(sym.st_info) == STB_GNU_UNIQUE)
+		c = 'u';
+	else if (ELF64_ST_BIND(sym.st_info) == STB_WEAK)
+	{
+		c = 'W';
+		if (sym.st_shndx == SHN_UNDEF)
+			c = 'w';
+	}
+	else if (ELF64_ST_BIND(sym.st_info) == STB_WEAK &&
+			ELF64_ST_TYPE(sym.st_info) == STT_OBJECT)
+	{
+		c = 'V';
+		if (sym.st_shndx == SHN_UNDEF)
+			c = 'v';
+	}
+	else if (sym.st_shndx == SHN_UNDEF)
+		c = 'U';
+	else if (sym.st_shndx == SHN_ABS)
+		c = 'A';
+	else if (sym.st_shndx == SHN_COMMON)
+		c = 'C';
+	else if (!ft_strcmp(".bss", str + shdr[sym.st_shndx].sh_name))
+		c = 'B';
+	else if (!ft_strcmp(".rodata", str + shdr[sym.st_shndx].sh_name))
+		c = 'R';
+	else if (!ft_strcmp(".data", str + shdr[sym.st_shndx].sh_name) ||
+		!ft_strcmp(".dynamic", str + shdr[sym.st_shndx].sh_name))
+		c = 'D';
+	else if (!ft_strcmp(".text", str + shdr[sym.st_shndx].sh_name))
+		c = 'T';
+	else
+	{
+		c = '?';
+		printf("name        : %s\n",    str + shdr[sym.st_shndx].sh_name);
+	}
+	if (ELF64_ST_BIND(sym.st_info) == STB_LOCAL && c != '?')
+		c += 32;
+	return c;
 }
 
 void	print_elf(Elf64_Ehdr elf)
@@ -150,9 +156,9 @@ void	print_self(char *all, t_elf elf, Elf64_Shdr *shdr, int len)
 		if (ttype != 4 && ttype != 3)
 		{
 			if (sym[y].st_value)
-				printf("%.16lx %c %s\n", sym[y].st_value, symbol(sym[y], shdr), sstr + sym[y].st_name);
+				printf("%.16lx %c %s\n", sym[y].st_value, symbol(str, sym[y], shdr), sstr + sym[y].st_name);
 			else
-				printf("%16c %c %s\n", ' ', symbol(sym[y], shdr), sstr + sym[y].st_name);
+				printf("%16c %c %s\n", ' ', symbol(str, sym[y], shdr), sstr + sym[y].st_name);
 		}
 		// else
 		// 		printf("%16d %c %s\n", ttype, symbol(sym[y], shdr), sstr + sym[y].st_name);
