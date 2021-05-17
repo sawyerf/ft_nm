@@ -21,7 +21,9 @@ INC_FILE =	ft_nm.h
 		
 SRC_DIR =	src
 
-SRC_FILE =	main.c
+SRC_FILE =	main.c \
+			64elf.c \
+			symbol.c
 
 CFLAGS =	-I $(INC_DIR) -I libft/inc/ -Wall -g -lm -Werror -Wextra
 
