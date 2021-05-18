@@ -17,7 +17,7 @@ void	get_sym(t_64sym *sym, t_64elf elf)
 	}
 }
 
-void	print_self(t_64elf elf, t_64sym sym)
+void	print_sym(t_64elf elf, t_64sym sym)
 {
 	char		*str;
 	int			ttype;
@@ -29,9 +29,9 @@ void	print_self(t_64elf elf, t_64sym sym)
 		if (ttype != 4 && ttype != 3)
 		{
 			if (sym.sym[y].st_value)
-				printf("%.16lx %c %s\n", sym.sym[y].st_value, symbol(str, sym.sym[y], elf.shdr), sym.str + sym.sym[y].st_name);
+				printf("%.16lx %c %s\n", sym.sym[y].st_value, symbol64(str, sym.sym[y], elf.shdr), sym.str + sym.sym[y].st_name);
 			else
-				printf("%16c %c %s\n", ' ', symbol(str, sym.sym[y], elf.shdr), sym.str + sym.sym[y].st_name);
+				printf("%16c %c %s\n", ' ', symbol64(str, sym.sym[y], elf.shdr), sym.str + sym.sym[y].st_name);
 		}
 	}
 }
@@ -47,6 +47,5 @@ void	elf64(char *ptr, struct stat st)
 	elf.ptr = ptr;
 	elf.size = st.st_size;
 	get_sym(&sym, elf);
-	print_self(elf, sym);
+	print_sym(elf, sym);
 }
-

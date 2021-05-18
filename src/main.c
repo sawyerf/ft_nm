@@ -28,26 +28,23 @@ int		c32or64(char *ptr)
 		return (INVCL);
 }
 
-void	elf32(char *ptr, struct stat st)
-{
-	t_32elf	elf;
-
-	(void)st;
-	ft_memcpy(&elf.ehdr, ptr, sizeof(Elf32_Ehdr));
-	ft_memcpy(&elf.phdr, ptr + elf.ehdr.e_phoff, sizeof(Elf32_Phdr));
-	elf.shdr = (Elf32_Shdr*)(ptr + elf.ehdr.e_shoff);
-}
-
 int main(int argi, char **argv)
 {
 	char	*ptr;
 	struct stat st;
 	int		class;
 
+	(void)argi;
 	ptr = readf(argv[1], &st);
 	class = c32or64(ptr);
 	if (class == ELF32)
-		(void)argi;
+	{
+	printf("32bits\n");
+		elf32(ptr, st);
+	}
 	else if (class == ELF64)
+{
+	printf("64bits\n");
 		elf64(ptr, st);
+}
 }

@@ -26,6 +26,8 @@ typedef struct	s_32elf
 	Elf32_Ehdr ehdr;
 	Elf32_Phdr phdr;
 	Elf32_Shdr *shdr;
+	char		*ptr;
+	size_t		size;
 }				t_32elf;
 
 typedef struct	s_64sym
@@ -35,7 +37,16 @@ typedef struct	s_64sym
 	char		*str;
 }				t_64sym;
 
-char	symbol(char *str, Elf64_Sym sym, Elf64_Shdr *shdr);
+typedef struct	s_32sym
+{
+	Elf32_Sym	*sym;
+	int			size;
+	char		*str;
+}				t_32sym;
+
+char	symbol64(char *str, Elf64_Sym sym, Elf64_Shdr *shdr);
+char	symbol32(char *str, Elf32_Sym sym, Elf32_Shdr *shdr);
 void	elf64(char *ptr, struct stat st);
+void	elf32(char *ptr, struct stat st);
 
 #endif
