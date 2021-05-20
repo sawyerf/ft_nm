@@ -21,19 +21,18 @@ void	print_sym(t_64elf elf, t_64sym sym)
 {
 	char		*str;
 	int			ttype;
+	t_symbol	*symbol;
 
 	str = elf.ptr + elf.shdr[elf.ehdr.e_shstrndx].sh_offset;
+	symbol = ft_memalloc(sizeof(t_symbol) * (sym.size + 1));
 	for (int y = 0; y < sym.size; y++)
 	{
 		ttype = ELF64_ST_TYPE(sym.sym[y].st_info);
 		if (ttype != 4 && ttype != 3)
-		{
-			if (sym.sym[y].st_value)
-				printf("%.16lx %c %s\n", sym.sym[y].st_value, symbol64(str, sym.sym[y], elf.shdr), sym.str + sym.sym[y].st_name);
-			else
-				printf("%16c %c %s\n", ' ', symbol64(str, sym.sym[y], elf.shdr), sym.str + sym.sym[y].st_name);
-		}
+			addsym(symbol, sym.str + sym.sym[y].st_name, symbol64(str, sym.sym[y], elf.shdr), sym.sym[y].st_value);
 	}
+	for (int y = 0; symbol[y].name; y++)
+		printf("%016lx %c %s\n", symbol[y].addr, symbol[y].symbol, symbol[y].name);
 }
 
 void	elf64(char *ptr, struct stat st)

@@ -1,43 +1,68 @@
-typedef struct	s_symbol
-{
-	char		*name;
-	char		symbol;
-	long int	addr;
-}				t_symbol;
+#include "libft.h"
+#include "ft_nm.h"
 
 int			sortcomp(char *s1, char *s2)
 {
+	return s2 - s1;
 	while (*s1 && *s2)
 	{
 		if (*s1 != *s2)
 			return (*s2 - *s1);
+		s1++;
+		s2++;
 	}
 	return (*s2 - *s1);
 }
 
+t_symbol	symcpy(t_symbol dst, t_symbol cpy)
+{
+	dst.name = cpy.name;
+	dst.addr = cpy.addr;
+	dst.symbol = cpy.symbol;
+	return (dst);
+}
+
 t_symbol	*decal(t_symbol *sym)
 {
-	t_symbol	cpy;
+	t_symbol	cpy0;
+	t_symbol	cpy1;
 	int			i;
 	
+	ft_memset(&cpy0, 0, sizeof(t_symbol));
+	ft_memset(&cpy1, 0, sizeof(t_symbol));
+	cpy0 = symcpy(cpy0, sym[0]);
 	i = 0;
-	while (sym[i])
+	while (sym[i].name)
 	{
-		memcpy(sym[i], cpy, typedef(
+		cpy1 = symcpy(cpy1, sym[i + 1]);
+		sym[i + 1] = symcpy(sym[i + 1], cpy0);
+		cpy0 = symcpy(cpy0, cpy1);
 		i++;
 	}
+	return (sym);
 }
+
 t_symbol	*addsym(t_symbol *sym, char *name, char symbol, long int addr)
 {
 	int		i;
 	
-	while (sym[i])
+	i = 0;
+	if (!name[0])
+		return sym;
+	while (sym[i].name)
 	{
-		if (sortcomp(sym[i], name) == -1)
+		if (sortcomp(sym[i].name, name) < 0)
 		{
-			
+			decal(sym + i);
+			sym[i].name = name;
+			sym[i].symbol = symbol;
+			sym[i].addr = addr;
+			return sym;
 		}
 		i++;
 	}
+	sym[i].name = name;
+	sym[i].symbol = symbol;
+	sym[i].addr = addr;
 	return sym;
 }

@@ -38,13 +38,7 @@ int main(int argi, char **argv)
 	ptr = readf(argv[1], &st);
 	class = c32or64(ptr);
 	if (class == ELF32)
-	{
-	printf("32bits\n");
 		elf32(ptr, st);
-	}
 	else if (class == ELF64)
-{
-	printf("64bits\n");
 		elf64(ptr, st);
-}
 }

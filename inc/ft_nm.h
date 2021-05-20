@@ -44,9 +44,17 @@ typedef struct	s_32sym
 	char		*str;
 }				t_32sym;
 
+typedef struct	s_symbol
+{
+	char		*name;
+	char		symbol;
+	long int	addr;
+}				t_symbol;
+
 char	symbol64(char *str, Elf64_Sym sym, Elf64_Shdr *shdr);
 char	symbol32(char *str, Elf32_Sym sym, Elf32_Shdr *shdr);
 void	elf64(char *ptr, struct stat st);
 void	elf32(char *ptr, struct stat st);
+t_symbol	*addsym(t_symbol *sym, char *name, char symbol, long int addr);
 
 #endif
