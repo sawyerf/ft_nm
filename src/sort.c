@@ -3,15 +3,18 @@
 
 int			sortcomp(char *s1, char *s2)
 {
-	return s2 - s1;
 	while (*s1 && *s2)
 	{
-		if (*s1 != *s2)
-			return (*s2 - *s1);
+		while (!ft_isalpha(*s1))
+			s1++;
+		while (!ft_isalpha(*s2))
+			s2++;
+		if (ft_toupper(*s1) != ft_toupper(*s2))
+			return (ft_toupper(*s2) - ft_toupper(*s1));
 		s1++;
 		s2++;
 	}
-	return (*s2 - *s1);
+	return (ft_toupper(*s2) - ft_toupper(*s1));
 }
 
 t_symbol	symcpy(t_symbol dst, t_symbol cpy)

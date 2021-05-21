@@ -45,7 +45,7 @@ char	symbol64(char *str, Elf64_Sym sym, Elf64_Shdr *shdr)
 	else
 	{
 		c = '?';
-		printf("name        : %s\n",    str + shdr[sym.st_shndx].sh_name);
+		// printf("name        : %s\n",    str + shdr[sym.st_shndx].sh_name);
 	}
 	if (ELF64_ST_BIND(sym.st_info) == STB_LOCAL && c != '?')
 		c += 32;
@@ -96,7 +96,7 @@ char	symbol32(char *str, Elf32_Sym sym, Elf32_Shdr *shdr)
 	else
 	{
 		c = '?';
-		printf("name        : %s\n",    str + shdr[sym.st_shndx].sh_name);
+		// printf("name        : %s\n",    str + shdr[sym.st_shndx].sh_name);
 	}
 	if (ELF32_ST_BIND(sym.st_info) == STB_LOCAL && c != '?')
 		c += 32;

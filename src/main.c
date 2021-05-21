@@ -1,5 +1,6 @@
 #include <sys/mman.h>
 #include <fcntl.h>
+#include <ar.h>
 #include "libft.h"
 #include "ft_nm.h"
 
@@ -18,6 +19,8 @@ char	*readf(char *file, struct stat *st)
 
 int		c32or64(char *ptr)
 {
+	if (!ft_strncmp(ptr, ARMAG, SARMAG))
+		return (ARCH);
 	if (ft_strncmp(ptr, ELFMAG, SELFMAG))
 		return (NOTELF);
 	if (ptr[EI_CLASS] == ELFCLASS32)
@@ -41,4 +44,8 @@ int main(int argi, char **argv)
 		elf32(ptr, st);
 	else if (class == ELF64)
 		elf64(ptr, st);
+	else if (class == ARCH)
+		arch(ptr, st);
+	else
+		printf("autre\n");
 }
