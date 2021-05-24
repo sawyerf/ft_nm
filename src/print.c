@@ -53,15 +53,17 @@ void	print_oself(char *str, Elf64_Shdr shdr)
 
 void	print_sym(char *all, char *sstr, Elf64_Sym sym)
 {
+	(void)all;
 	printf("======== ST =======\n");
-	printf("nameee  : %s\n",    sstr + sym.st_name);
 	printf("st_name : 0x%d\n",  sym.st_name);
+	if (sym.st_name < 100000)
+		printf("nameee  : %s\n",    sstr + sym.st_name);
 	printf("st_info : %d\n", ELF64_ST_TYPE(sym.st_info));
 	printf("st_other: %c\n",    sym.st_other);
-	printf("st_shndx: %s\n",    all + sym.st_shndx);
+	// printf("st_shndx: %s\n",    all + sym.st_shndx);
 	printf("st_shndx: %d\n",    sym.st_shndx);
 	printf("st_value: 0x%ld\n", sym.st_value);
-	printf("st_value: %s\n", all + sym.st_value + sym.st_shndx);
+	// printf("st_value: %s\n", all + sym.st_value + sym.st_shndx);
 	printf("st_size : 0x%ld\n", sym.st_size);
 }
 

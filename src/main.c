@@ -41,11 +41,11 @@ int main(int argi, char **argv)
 	ptr = readf(argv[1], &st);
 	class = c32or64(ptr);
 	if (class == ELF32)
-		elf32(ptr, st);
+		elf32(ptr, st.st_size);
 	else if (class == ELF64)
-		elf64(ptr, st);
+		elf64(ptr, st.st_size);
 	else if (class == ARCH)
-		arch(ptr, st);
-	else
-		printf("autre\n");
+		arch(ptr, st.st_size);
+	else if (class == NOTELF)
+		dprintf(2, "nm: %s: file format not recognized\n", argv[1]);
 }
