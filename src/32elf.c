@@ -17,24 +17,33 @@ void	get_32sym(t_32sym *sym, t_32elf elf)
 	}
 }
 
+void	print_32osym(t_symbol symbol)
+{
+	if (symbol.symbol != 'U' && symbol.symbol != 'w' && symbol.symbol != 'v')
+		printf("%08lx %c %s\n", symbol.addr, symbol.symbol, symbol.name);
+	else
+		printf("%8c %c %s\n", ' ', symbol.symbol, symbol.name);
+}
+
 void	print_32sym(t_32elf elf, t_32sym sym)
 {
 	char		*str;
 	int			ttype;
+	t_symbol	*symbol;
 
+	symbol = ft_memalloc(sizeof(t_symbol) * (sym.size + 1));
 	str = elf.ptr + elf.shdr[elf.ehdr.e_shstrndx].sh_offset;
 	(void)str;
 	for (int y = 0; y < sym.size; y++)
 	{
 		ttype = ELF32_ST_TYPE(sym.sym[y].st_info);
-		if (ttype != 4 && ttype != 3)
-		{
-			if (sym.sym[y].st_value)
-				printf("%.16x %s\n", sym.sym[y].st_value, sym.str + sym.sym[y].st_name);
-			else
-				printf("%16c %s\n", ' ', sym.str + sym.sym[y].st_name);
-		}
+		if (ttype == STT_FUNC || ttype == STT_OBJECT || ttype == STT_NOTYPE)
+			addsym(symbol, sym.str + sym.sym[y].st_name, symbol32(str, sym.sym[y], elf.shdr), sym.sym[y].st_value);
 	}
+	if (!symbol[0].name)
+		return ;
+	for (int y = 0; symbol[y].name; y++)
+		print_32osym(symbol[y]);
 }
 
 void	elf32(char *ptr, size_t size)

@@ -3,18 +3,25 @@
 
 int			sortcomp(char *s1, char *s2)
 {
-	while (*s1 && *s2)
+	int	i;
+	int y;
+
+	i = 0;
+	y = 0;
+	while (s1[i] && s2[y])
 	{
-		while (!ft_isalpha(*s1))
-			s1++;
-		while (!ft_isalpha(*s2))
-			s2++;
-		if (ft_toupper(*s1) != ft_toupper(*s2))
-			return (ft_toupper(*s2) - ft_toupper(*s1));
-		s1++;
-		s2++;
+		while (!ft_isalnum(s1[i]) && s1[i + 1])
+			i++;
+		while (!ft_isalnum(s2[y]) && s2[y + 1])
+			y++;
+		if (ft_toupper(s1[i]) != ft_toupper(s2[y]))
+			return (ft_toupper(s2[y]) - ft_toupper(s1[i]));
+		i++;
+		y++;
 	}
-	return (ft_toupper(*s2) - ft_toupper(*s1));
+	if (!(ft_toupper(s1[i]) != ft_toupper(s2[y])))
+		return (-1 * ft_strcmp(s1, s2));
+	return (ft_toupper(s2[y]) - ft_toupper(s1[i]));
 }
 
 t_symbol	symcpy(t_symbol dst, t_symbol cpy)

@@ -20,7 +20,7 @@ void	get_sym(t_64sym *sym, t_64elf elf)
 
 void	print_64osym(t_symbol symbol)
 {
-	if (symbol.symbol != 'U')
+	if (symbol.symbol != 'U' && symbol.symbol != 'w' && symbol.symbol != 'v')
 		printf("%016lx %c %s\n", symbol.addr, symbol.symbol, symbol.name);
 	else
 		printf("%16c %c %s\n", ' ', symbol.symbol, symbol.name);
