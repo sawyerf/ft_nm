@@ -47,5 +47,5 @@ int main(int argi, char **argv)
 	else if (class == ARCH)
 		arch(ptr, st.st_size);
 	else if (class == NOTELF)
-		dprintf(2, "nm: %s: file format not recognized\n", argv[1]);
+		dprintf(2, "ft_nm: %s: file format not recognized\n", argv[1]);
 }

@@ -18,15 +18,23 @@ void	get_32sym(t_32sym *sym, t_32elf elf)
 	}
 }
 
-void	print_32osym(t_symbol symbol)
+void	print_32sym(t_symbol *symbol)
 {
-	if (symbol.symbol != 'U' && symbol.symbol != 'w' && symbol.symbol != 'v')
-		printf("%08lx %c %s\n", symbol.addr, symbol.symbol, symbol.name);
-	else
-		printf("%8c %c %s\n", ' ', symbol.symbol, symbol.name);
+	if (!symbol[0].name)
+	{
+		dprintf(2, "ft_nm: : aucun symbole\n");
+		return ;
+	}
+	for (int y = 0; symbol[y].name; y++)
+	{
+		if (symbol[y].symbol != 'U' && symbol[y].symbol != 'w' && symbol[y].symbol != 'v')
+			printf("%08lx %c %s\n", symbol[y].addr, symbol[y].symbol, symbol[y].name);
+		else
+			printf("%8c %c %s\n", ' ', symbol[y].symbol, symbol[y].name);
+	}
 }
 
-void	print_32sym(t_32elf elf, t_32sym sym)
+t_symbol	*filter_32sym(t_32elf elf, t_32sym sym)
 {
 	char		*str;
 	int			ttype;
@@ -40,24 +48,21 @@ void	print_32sym(t_32elf elf, t_32sym sym)
 		if (ttype == STT_FUNC || ttype == STT_OBJECT || ttype == STT_NOTYPE)
 			addsym(symbol, sym.str + sym.sym[y].st_name, symbol32(str, sym.sym[y], elf.shdr), sym.sym[y].st_value);
 	}
-	if (!symbol[0].name)
-		return ;
-	for (int y = 0; symbol[y].name; y++)
-		print_32osym(symbol[y]);
+	return (symbol);
 }
 
 void	elf32(char *ptr, size_t size)
 {
-	t_32elf	elf;
-	t_32sym	sym;
+	t_32elf		elf;
+	t_32sym		sym;
+	t_symbol	*symbol;
 
 	ft_memcpy(&elf.ehdr, ptr, sizeof(Elf32_Ehdr));
-	ft_printf("%b\n", elf.ehdr.e_phoff);
-	printf("%ld\n", size);
  	ft_memcpy(&elf.phdr, ptr + elf.ehdr.e_phoff, sizeof(Elf32_Phdr));
 	elf.shdr = (Elf32_Shdr*)(ptr + elf.ehdr.e_shoff);
 	elf.ptr = ptr;
 	elf.size = size;
 	get_32sym(&sym, elf);
-	print_32sym(elf, sym);
+	symbol = filter_32sym(elf, sym);
+	print_32sym(symbol);
 }
