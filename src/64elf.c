@@ -5,7 +5,6 @@ void	get_sym(t_64sym *sym, t_64elf elf)
 {
 	int			len;
 
-	sym->str = elf.ptr + elf.shdr[elf.ehdr.e_shstrndx - 1].sh_offset;
 	len = (elf.size - elf.ehdr.e_shoff) / sizeof(Elf64_Shdr);
 	for (int i = 0; i < len; i++)
 	{
@@ -13,6 +12,7 @@ void	get_sym(t_64sym *sym, t_64elf elf)
 		{
 			sym->sym = (Elf64_Sym*)(elf.ptr + elf.shdr[i].sh_offset);
 			sym->size = elf.shdr[i].sh_size / sizeof(Elf64_Sym);
+			sym->str = elf.ptr + elf.shdr[elf.shdr[i].sh_link].sh_offset;
 			return ;
 		}
 	}

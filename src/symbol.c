@@ -5,6 +5,7 @@ char	symbol64(char *str, Elf64_Sym sym, Elf64_Shdr *shdr)
 {
 	char	c;
 	
+	(void)str;
 	if (ELF64_ST_BIND(sym.st_info) == STB_GNU_UNIQUE)
 		c = 'u';
 	else if (ELF64_ST_BIND(sym.st_info) == STB_WEAK)
@@ -26,19 +27,22 @@ char	symbol64(char *str, Elf64_Sym sym, Elf64_Shdr *shdr)
 		c = 'A';
 	else if (sym.st_shndx == SHN_COMMON)
 		c = 'C';
-	else if (!ft_strncmp(".bss", str + shdr[sym.st_shndx].sh_name, 4))
+	else if (shdr[sym.st_shndx].sh_type == SHT_NOBITS)
 		c = 'B';
-	else if (!ft_strcmp(".rodata", str + shdr[sym.st_shndx].sh_name) ||
-		!ft_strncmp(".eh_frame", str + shdr[sym.st_shndx].sh_name, 8))
+	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_MERGE))
 		c = 'R';
-	else if (!ft_strcmp(".data", str + shdr[sym.st_shndx].sh_name) ||
-		!ft_strncmp(".got", str + shdr[sym.st_shndx].sh_name, 4) ||
-		!ft_strcmp(".dynamic", str + shdr[sym.st_shndx].sh_name))
+	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC)) //.rodata*
+		c = 'R';
+	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE)) //.data*
 		c = 'D';
-	else if (!ft_strcmp(".text", str + shdr[sym.st_shndx].sh_name) ||
-		!ft_strncmp(".fini", str + shdr[sym.st_shndx].sh_name, 5) ||
-		!ft_strncmp(".init", str + shdr[sym.st_shndx].sh_name, 5))
+	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS) //.text
 		c = 'T';
+	else if (shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY) //.init_array
+		c = 'T';
+	else if (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY) //.fini_array
+		c = 'T';
+	else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC) //.dynamic
+		c = 'D';
 	else
 		c = '?';
 	if (ELF64_ST_BIND(sym.st_info) == STB_LOCAL && c != '?')
@@ -50,14 +54,9 @@ char	symbol32(char *str, Elf32_Sym sym, Elf32_Shdr *shdr)
 {
 	char	c;
 	
+	(void)str;
 	if (ELF32_ST_BIND(sym.st_info) == STB_GNU_UNIQUE)
 		c = 'u';
-	else if (ELF32_ST_BIND(sym.st_info) == STB_WEAK)
-	{
-		c = 'W';
-		if (sym.st_shndx == SHN_UNDEF)
-			c = 'w';
-	}
 	else if (ELF32_ST_BIND(sym.st_info) == STB_WEAK &&
 			ELF32_ST_TYPE(sym.st_info) == STT_OBJECT)
 	{
@@ -65,25 +64,34 @@ char	symbol32(char *str, Elf32_Sym sym, Elf32_Shdr *shdr)
 		if (sym.st_shndx == SHN_UNDEF)
 			c = 'v';
 	}
+	else if (ELF32_ST_BIND(sym.st_info) == STB_WEAK)
+	{
+		c = 'W';
+		if (sym.st_shndx == SHN_UNDEF)
+			c = 'w';
+	}
 	else if (sym.st_shndx == SHN_UNDEF)
 		c = 'U';
 	else if (sym.st_shndx == SHN_ABS)
 		c = 'A';
 	else if (sym.st_shndx == SHN_COMMON)
 		c = 'C';
-	else if (!ft_strncmp(".bss", str + shdr[sym.st_shndx].sh_name, 4))
+	else if (shdr[sym.st_shndx].sh_type == SHT_NOBITS)
 		c = 'B';
-	else if (!ft_strcmp(".rodata", str + shdr[sym.st_shndx].sh_name) ||
-		!ft_strncmp(".eh_frame", str + shdr[sym.st_shndx].sh_name, 8))
+	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_MERGE))
 		c = 'R';
-	else if (!ft_strcmp(".data", str + shdr[sym.st_shndx].sh_name) ||
-		!ft_strncmp(".got", str + shdr[sym.st_shndx].sh_name, 4) ||
-		!ft_strcmp(".dynamic", str + shdr[sym.st_shndx].sh_name))
+	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC)) //.rodata*
+		c = 'R';
+	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE)) //.data*
 		c = 'D';
-	else if (!ft_strcmp(".text", str + shdr[sym.st_shndx].sh_name) ||
-		!ft_strncmp(".fini", str + shdr[sym.st_shndx].sh_name, 5) ||
-		!ft_strncmp(".init", str + shdr[sym.st_shndx].sh_name, 5))
+	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS) //.text
 		c = 'T';
+	else if (shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY) //.init_array
+		c = 'T';
+	else if (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY) //.fini_array
+		c = 'T';
+	else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC) //.dynamic
+		c = 'D';
 	else
 		c = '?';
 	if (ELF32_ST_BIND(sym.st_info) == STB_LOCAL && c != '?')
