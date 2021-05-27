@@ -36,7 +36,7 @@ void	arch(char *ptr, size_t size)
 		ft_memcpy(&arc, ptr, sizeof(arc));
 		ptr += sizeof(arc);
 
-		class = c32or64(ptr);
+		class = amagic(ptr);
 		if ((class == ELF32 || class == ELF64) && size > 1)
 			printf("\n");
 		size -= ft_atoi(arc.ar_size) + sizeof(arc);
