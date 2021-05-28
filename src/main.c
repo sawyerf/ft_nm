@@ -55,11 +55,12 @@ int main(int argi, char **argv)
 		if (!(ptr = readf(argv[i], &st)))
 			continue;
 		class = amagic(ptr);
-		printf("\n%s:\n", argv[i]);
+		if (argi > 2)
+			printf("\n%s:\n", argv[i]);
 		if (class == ELF32)
-			elf32(ptr, st.st_size);
+			elf32(ptr, st.st_size, argv[i]);
 		else if (class == ELF64)
-			elf64(ptr, st.st_size);
+			elf64(ptr, st.st_size, argv[i]);
 		else if (class == ARCH)
 			arch(ptr, st.st_size);
 		else if (class == NOTELF)

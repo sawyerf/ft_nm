@@ -80,17 +80,17 @@ char	symbol32(char *str, Elf32_Sym sym, Elf32_Shdr *shdr)
 		c = 'B';
 	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_MERGE))
 		c = 'R';
-	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC)) //.rodata*
+	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC))
 		c = 'R';
-	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE)) //.data*
+	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
 		c = 'D';
-	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS) //.text
+	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS)
 		c = 'T';
-	else if (shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY) //.init_array
+	else if (shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY)
 		c = 'T';
-	else if (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY) //.fini_array
+	else if (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY)
 		c = 'T';
-	else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC) //.dynamic
+	else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC)
 		c = 'D';
 	else
 		c = '?';

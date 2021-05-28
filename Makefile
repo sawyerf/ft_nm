@@ -26,7 +26,6 @@ SRC_FILE =	main.c \
 			32elf.c \
 			sort.c \
 			arch.c \
-			print.c \
 			symbol.c
 
 CFLAGS =	-I $(INC_DIR) -I libft/inc/ -Wall -g -lm -Werror -Wextra

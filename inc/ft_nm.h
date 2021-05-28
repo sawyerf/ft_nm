@@ -54,14 +54,10 @@ typedef struct	s_symbol
 
 char			symbol64(char *str, Elf64_Sym sym, Elf64_Shdr *shdr);
 char			symbol32(char *str, Elf32_Sym sym, Elf32_Shdr *shdr);
-void			elf64(char *ptr, size_t size);
-void			elf32(char *ptr, size_t size);
+void			elf64(char *ptr, size_t size, char *file);
+void			elf32(char *ptr, size_t size, char *file);
 void			arch (char *ptr, size_t size);
 t_symbol		*addsym(t_symbol *sym, char *name, char symbol, long int addr);
 int				amagic(char *ptr);
-void			print_elf(Elf64_Ehdr elf);
-void			print_pelf(Elf64_Phdr pelf);
-void			print_sym(char *all, char *sstr, Elf64_Sym sym);
-void			print_oself(char *str, Elf64_Shdr shdr);
 
 #endif

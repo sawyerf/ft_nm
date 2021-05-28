@@ -1,7 +1,7 @@
 #include "libft.h"
 #include "ft_nm.h"
 
-void	get_32sym(t_32sym *sym, t_32elf elf)
+int			get_32sym(t_32sym *sym, t_32elf elf)
 {
 	int			len;
 
@@ -13,25 +13,10 @@ void	get_32sym(t_32sym *sym, t_32elf elf)
 			sym->sym = (Elf32_Sym*)(elf.ptr + elf.shdr[i].sh_offset);
 			sym->size = elf.shdr[i].sh_size / sizeof(Elf32_Sym);
 			sym->str = elf.ptr + elf.shdr[elf.shdr[i].sh_link].sh_offset;
-			return ;
+			return (1);
 		}
 	}
-}
-
-void	print_32sym(t_symbol *symbol)
-{
-	if (!symbol[0].name)
-	{
-		dprintf(2, "ft_nm: : aucun symbole\n");
-		return ;
-	}
-	for (int y = 0; symbol[y].name; y++)
-	{
-		if (symbol[y].symbol != 'U' && symbol[y].symbol != 'w' && symbol[y].symbol != 'v')
-			printf("%08lx %c %s\n", symbol[y].addr, symbol[y].symbol, symbol[y].name);
-		else
-			printf("%8c %c %s\n", ' ', symbol[y].symbol, symbol[y].name);
-	}
+	return (0);
 }
 
 t_symbol	*filter_32sym(t_32elf elf, t_32sym sym)
@@ -51,18 +36,41 @@ t_symbol	*filter_32sym(t_32elf elf, t_32sym sym)
 	return (symbol);
 }
 
-void	elf32(char *ptr, size_t size)
+void		print_32sym(t_symbol *symbol, char *file)
+{
+	if (!symbol[0].name)
+	{
+		dprintf(2, "ft_nm: %s: aucun symbole\n", file);
+		return ;
+	}
+	for (int y = 0; symbol[y].name; y++)
+	{
+		if (symbol[y].symbol != 'U' && symbol[y].symbol != 'w' && symbol[y].symbol != 'v')
+			printf("%08lx %c %s\n", symbol[y].addr, symbol[y].symbol, symbol[y].name);
+		else
+			printf("%8c %c %s\n", ' ', symbol[y].symbol, symbol[y].name);
+	}
+}
+
+void	elf32(char *ptr, size_t size, char *file)
 {
 	t_32elf		elf;
 	t_32sym		sym;
 	t_symbol	*symbol;
 
 	ft_memcpy(&elf.ehdr, ptr, sizeof(Elf32_Ehdr));
+	if (elf.ehdr.e_phoff > size || elf.ehdr.e_shoff > size)
+		return ;
  	ft_memcpy(&elf.phdr, ptr + elf.ehdr.e_phoff, sizeof(Elf32_Phdr));
 	elf.shdr = (Elf32_Shdr*)(ptr + elf.ehdr.e_shoff);
 	elf.ptr = ptr;
 	elf.size = size;
-	get_32sym(&sym, elf);
+	if (!get_32sym(&sym, elf))
+	{
+		dprintf(2, "ft_nm: %s: aucun symbole\n", file);
+		return ;
+	}
 	symbol = filter_32sym(elf, sym);
-	print_32sym(symbol);
+	print_32sym(symbol, file);
+	free(symbol);
 }

@@ -1,7 +1,7 @@
 #include "libft.h"
 #include "ft_nm.h"
 
-void	get_sym(t_64sym *sym, t_64elf elf)
+int		get_sym(t_64sym *sym, t_64elf elf)
 {
 	int			len;
 
@@ -13,25 +13,10 @@ void	get_sym(t_64sym *sym, t_64elf elf)
 			sym->sym = (Elf64_Sym*)(elf.ptr + elf.shdr[i].sh_offset);
 			sym->size = elf.shdr[i].sh_size / sizeof(Elf64_Sym);
 			sym->str = elf.ptr + elf.shdr[elf.shdr[i].sh_link].sh_offset;
-			return ;
+			return (1);
 		}
 	}
-}
-
-void	print_64sym(t_symbol *symbol)
-{
-	if (!symbol[0].name)
-	{
-		dprintf(2, "ft_nm: : aucun symbole\n");
-		return ;
-	}
-	for (int y = 0; symbol[y].name; y++)
-	{
-		if (symbol[y].symbol != 'U' && symbol[y].symbol != 'w' && symbol[y].symbol != 'v')
-			printf("%016lx %c %s\n", symbol[y].addr, symbol[y].symbol, symbol[y].name);
-		else
-			printf("%16c %c %s\n", ' ', symbol[y].symbol, symbol[y].name);
-	}
+	return (0);
 }
 
 t_symbol	*filter_64sym(t_64elf elf, t_64sym sym)
@@ -51,7 +36,23 @@ t_symbol	*filter_64sym(t_64elf elf, t_64sym sym)
 	return (symbol);
 }
 
-void	elf64(char *ptr, size_t size)
+void	print_64sym(t_symbol *symbol, char *file)
+{
+	if (!symbol[0].name)
+	{
+		dprintf(2, "ft_nm: %s: aucun symbole\n", file);
+		return ;
+	}
+	for (int y = 0; symbol[y].name; y++)
+	{
+		if (symbol[y].symbol != 'U' && symbol[y].symbol != 'w' && symbol[y].symbol != 'v')
+			printf("%016lx %c %s\n", symbol[y].addr, symbol[y].symbol, symbol[y].name);
+		else
+			printf("%16c %c %s\n", ' ', symbol[y].symbol, symbol[y].name);
+	}
+}
+
+void	elf64(char *ptr, size_t size, char *file)
 {
 	t_64elf		elf;
 	t_64sym		sym;
@@ -62,7 +63,12 @@ void	elf64(char *ptr, size_t size)
 	elf.shdr = (Elf64_Shdr*)(ptr + elf.ehdr.e_shoff);
 	elf.ptr = ptr;
 	elf.size = size;
-	get_sym(&sym, elf);
+	if (!get_sym(&sym, elf))
+	{
+		dprintf(2, "ft_nm: %s: aucun symbole\n", file);
+		return ;
+	}
 	symbol = filter_64sym(elf, sym);
-	print_64sym(symbol);
+	print_64sym(symbol, file);
+	free(symbol);
 }

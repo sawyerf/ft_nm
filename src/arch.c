@@ -16,8 +16,7 @@ void	filename(char *name, char *funcs)
 	else if (i)
 	{
 		cpy = ft_strndup(name, i);
-		printf("%s:\n", cpy);
-		free(cpy);
+		printf("\n%s:\n", cpy); free(cpy);
 	}
 }
 
@@ -35,17 +34,14 @@ void	arch(char *ptr, size_t size)
 	{
 		ft_memcpy(&arc, ptr, sizeof(arc));
 		ptr += sizeof(arc);
-
 		class = amagic(ptr);
-		if ((class == ELF32 || class == ELF64) && size > 1)
-			printf("\n");
 		size -= ft_atoi(arc.ar_size) + sizeof(arc);
 		if (class == ELF32 || class == ELF64)
 			filename(arc.ar_name, func);
 		if (class == ELF32)
-			elf32(ptr, ft_atoi(arc.ar_size));
+			elf32(ptr, ft_atoi(arc.ar_size), "");
 		else if (class == ELF64)
-			elf64(ptr, ft_atoi(arc.ar_size));
+			elf64(ptr, ft_atoi(arc.ar_size), "");
 		else if (!func)
 			func = ptr;
 		ptr += ft_atoi(arc.ar_size);
