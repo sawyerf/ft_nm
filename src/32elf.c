@@ -5,14 +5,14 @@ int			get_32sym(t_32sym *sym, t_32elf elf)
 {
 	int			len;
 
-	len = (elf.size - elf.ehdr.e_shoff) / sizeof(Elf32_Shdr);
+	len = (elf.size - swap32(elf.ehdr.e_shoff, elf.endian)) / sizeof(Elf32_Shdr);
 	for (int i = 0; i < len; i++)
 	{
-		if (elf.shdr[i].sh_type == SHT_SYMTAB)
+		if (swap32(elf.shdr[i].sh_type, elf.endian) == SHT_SYMTAB)
 		{
-			sym->sym = (Elf32_Sym*)(elf.ptr + elf.shdr[i].sh_offset);
-			sym->size = elf.shdr[i].sh_size / sizeof(Elf32_Sym);
-			sym->str = elf.ptr + elf.shdr[elf.shdr[i].sh_link].sh_offset;
+			sym->sym = (Elf32_Sym*)(elf.ptr + swap32(elf.shdr[i].sh_offset, elf.endian));
+			sym->size = swap32(elf.shdr[i].sh_size, elf.endian) / sizeof(Elf32_Sym);
+			sym->str = elf.ptr + swap32(elf.shdr[swap32(elf.shdr[i].sh_link, elf.endian)].sh_offset, elf.endian);
 			return (1);
 		}
 	}
@@ -26,12 +26,12 @@ t_symbol	*filter_32sym(t_32elf elf, t_32sym sym)
 	t_symbol	*symbol;
 
 	symbol = ft_memalloc(sizeof(t_symbol) * (sym.size + 1));
-	str = elf.ptr + elf.shdr[elf.ehdr.e_shstrndx].sh_offset;
+	str = elf.ptr + swap32(elf.shdr[swap16(elf.ehdr.e_shstrndx, elf.endian)].sh_offset, elf.endian);
 	for (int y = 0; y < sym.size; y++)
 	{
 		ttype = ELF32_ST_TYPE(sym.sym[y].st_info);
 		if (ttype == STT_FUNC || ttype == STT_OBJECT || ttype == STT_NOTYPE)
-			addsym(symbol, sym.str + sym.sym[y].st_name, symbol32(str, sym.sym[y], elf.shdr), sym.sym[y].st_value);
+			addsym(symbol, sym.str + swap32(sym.sym[y].st_name, elf.endian), symbol32(str, sym.sym[y], elf.shdr), swap32(sym.sym[y].st_value, elf.endian));
 	}
 	return (symbol);
 }
@@ -58,11 +58,12 @@ void	elf32(char *ptr, size_t size, char *file)
 	t_32sym		sym;
 	t_symbol	*symbol;
 
+	elf.endian = ptr[EI_DATA];
 	ft_memcpy(&elf.ehdr, ptr, sizeof(Elf32_Ehdr));
-	if (elf.ehdr.e_phoff > size || elf.ehdr.e_shoff > size)
+	if (swap32(elf.ehdr.e_phoff, elf.endian) > size || swap32(elf.ehdr.e_shoff, elf.endian) > size)
 		return ;
- 	ft_memcpy(&elf.phdr, ptr + elf.ehdr.e_phoff, sizeof(Elf32_Phdr));
-	elf.shdr = (Elf32_Shdr*)(ptr + elf.ehdr.e_shoff);
+ 	ft_memcpy(&elf.phdr, ptr + swap32(elf.ehdr.e_phoff, elf.endian), sizeof(Elf32_Phdr));
+	elf.shdr = (Elf32_Shdr*)(ptr + swap32(elf.ehdr.e_shoff, elf.endian));
 	elf.ptr = ptr;
 	elf.size = size;
 	if (!get_32sym(&sym, elf))

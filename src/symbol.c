@@ -3,19 +3,28 @@
 
 char	symbol64(char *str, Elf64_Sym sym, Elf64_Shdr *shdr)
 {
-	char	c;
+	char			c;
+	Elf64_Word		sh_type;
+	Elf64_Xword		sh_flag;
+	unsigned char	st_bind;
+	unsigned char	st_type;
+	int		bind;
 	
 	(void)str;
-	if (ELF64_ST_BIND(sym.st_info) == STB_GNU_UNIQUE)
+	sh_type = shdr[sym.st_shndx].sh_type;
+	sh_flag = shdr[sym.st_shndx].sh_flags;
+	st_bind = ELF64_ST_BIND(sym.st_info);
+	st_type = ELF64_ST_TYPE(sym.st_info);
+	if (st_bind == STB_GNU_UNIQUE)
 		c = 'u';
-	else if (ELF64_ST_BIND(sym.st_info) == STB_WEAK)
+	else if (st_bind == STB_WEAK)
 	{
 		c = 'W';
 		if (sym.st_shndx == SHN_UNDEF)
 			c = 'w';
 	}
-	else if (ELF64_ST_BIND(sym.st_info) == STB_WEAK &&
-			ELF64_ST_TYPE(sym.st_info) == STT_OBJECT)
+	else if (st_bind == STB_WEAK &&
+			st_type == STT_OBJECT)
 	{
 		c = 'V';
 		if (sym.st_shndx == SHN_UNDEF)
@@ -27,25 +36,25 @@ char	symbol64(char *str, Elf64_Sym sym, Elf64_Shdr *shdr)
 		c = 'A';
 	else if (sym.st_shndx == SHN_COMMON)
 		c = 'C';
-	else if (shdr[sym.st_shndx].sh_type == SHT_NOBITS)
+	else if (sh_type == SHT_NOBITS)
 		c = 'B';
-	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_MERGE))
+	else if (sh_type == SHT_PROGBITS && sh_flag == (SHF_ALLOC | SHF_MERGE))
 		c = 'R';
-	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC)) //.rodata*
+	else if (sh_type == SHT_PROGBITS && sh_flag == (SHF_ALLOC))
 		c = 'R';
-	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE)) //.data*
+	else if (sh_type == SHT_PROGBITS && sh_flag == (SHF_ALLOC | SHF_WRITE))
 		c = 'D';
-	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS) //.text
+	else if (sh_type == SHT_PROGBITS)
 		c = 'T';
-	else if (shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY) //.init_array
+	else if (sh_type == SHT_INIT_ARRAY)
 		c = 'T';
-	else if (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY) //.fini_array
+	else if (sh_type == SHT_FINI_ARRAY)
 		c = 'T';
-	else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC) //.dynamic
+	else if (sh_type == SHT_DYNAMIC)
 		c = 'D';
 	else
 		c = '?';
-	if (ELF64_ST_BIND(sym.st_info) == STB_LOCAL && c != '?')
+	if (st_bind == STB_LOCAL && c != '?')
 		c += 32;
 	return c;
 }
@@ -53,18 +62,26 @@ char	symbol64(char *str, Elf64_Sym sym, Elf64_Shdr *shdr)
 char	symbol32(char *str, Elf32_Sym sym, Elf32_Shdr *shdr)
 {
 	char	c;
+	Elf32_Word		sh_type;
+	Elf32_Word		sh_flag;
+	unsigned char	st_bind;
+	unsigned char	st_type;
 	
 	(void)str;
-	if (ELF32_ST_BIND(sym.st_info) == STB_GNU_UNIQUE)
+	sh_type = shdr[sym.st_shndx].sh_type;
+	st_bind = ELF32_ST_BIND(sym.st_info);
+	st_type = ELF32_ST_TYPE(sym.st_info);
+	sh_flag = shdr[sym.st_shndx].sh_flags;
+	if (st_bind == STB_GNU_UNIQUE)
 		c = 'u';
-	else if (ELF32_ST_BIND(sym.st_info) == STB_WEAK &&
-			ELF32_ST_TYPE(sym.st_info) == STT_OBJECT)
+	else if (st_bind == STB_WEAK &&
+			st_type == STT_OBJECT)
 	{
 		c = 'V';
 		if (sym.st_shndx == SHN_UNDEF)
 			c = 'v';
 	}
-	else if (ELF32_ST_BIND(sym.st_info) == STB_WEAK)
+	else if (st_bind == STB_WEAK)
 	{
 		c = 'W';
 		if (sym.st_shndx == SHN_UNDEF)
@@ -76,25 +93,25 @@ char	symbol32(char *str, Elf32_Sym sym, Elf32_Shdr *shdr)
 		c = 'A';
 	else if (sym.st_shndx == SHN_COMMON)
 		c = 'C';
-	else if (shdr[sym.st_shndx].sh_type == SHT_NOBITS)
+	else if (sh_type == SHT_NOBITS)
 		c = 'B';
-	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_MERGE))
+	else if (sh_type == SHT_PROGBITS && sh_flag == (SHF_ALLOC | SHF_MERGE))
 		c = 'R';
-	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC))
+	else if (sh_type == SHT_PROGBITS && sh_flag == (SHF_ALLOC))
 		c = 'R';
-	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && shdr[sym.st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
+	else if (sh_type == SHT_PROGBITS && sh_flag == (SHF_ALLOC | SHF_WRITE))
 		c = 'D';
-	else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS)
+	else if (sh_type == SHT_PROGBITS)
 		c = 'T';
-	else if (shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY)
+	else if (sh_type == SHT_INIT_ARRAY)
 		c = 'T';
-	else if (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY)
+	else if (sh_type == SHT_FINI_ARRAY)
 		c = 'T';
-	else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC)
+	else if (sh_type == SHT_DYNAMIC)
 		c = 'D';
 	else
 		c = '?';
-	if (ELF32_ST_BIND(sym.st_info) == STB_LOCAL && c != '?')
+	if (st_bind == STB_LOCAL && c != '?')
 		c += 32;
 	return c;
 }

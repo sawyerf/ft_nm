@@ -20,6 +20,7 @@ typedef struct	s_64elf
 	Elf64_Shdr	*shdr;
 	char		*ptr;
 	size_t		size;
+	char		endian;
 }				t_64elf;
 
 typedef struct	s_32elf
@@ -29,6 +30,7 @@ typedef struct	s_32elf
 	Elf32_Shdr	*shdr;
 	char		*ptr;
 	size_t		size;
+	char		endian;
 }				t_32elf;
 
 typedef struct	s_64sym
@@ -59,5 +61,8 @@ void			elf32(char *ptr, size_t size, char *file);
 void			arch (char *ptr, size_t size);
 t_symbol		*addsym(t_symbol *sym, char *name, char symbol, long int addr);
 int				amagic(char *ptr);
+uint64_t		swap64(uint64_t nbr, char endian);
+uint32_t		swap32(uint32_t nbr, char endian);
+uint16_t		swap16(uint16_t nbr, char endian);
 
 #endif

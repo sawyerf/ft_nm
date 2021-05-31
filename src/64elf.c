@@ -5,14 +5,14 @@ int		get_sym(t_64sym *sym, t_64elf elf)
 {
 	int			len;
 
-	len = (elf.size - elf.ehdr.e_shoff) / sizeof(Elf64_Shdr);
+	len = (elf.size - swap64(elf.ehdr.e_shoff, elf.endian)) / sizeof(Elf64_Shdr);
 	for (int i = 0; i < len; i++)
 	{
-		if (elf.shdr[i].sh_type == SHT_SYMTAB)
+		if (swap64(elf.shdr[i].sh_type, elf.endian) == SHT_SYMTAB)
 		{
-			sym->sym = (Elf64_Sym*)(elf.ptr + elf.shdr[i].sh_offset);
-			sym->size = elf.shdr[i].sh_size / sizeof(Elf64_Sym);
-			sym->str = elf.ptr + elf.shdr[elf.shdr[i].sh_link].sh_offset;
+			sym->sym = (Elf64_Sym*)(elf.ptr + swap64(elf.shdr[i].sh_offset, elf.endian));
+			sym->size = swap64(elf.shdr[i].sh_size, elf.endian) / sizeof(Elf64_Sym);
+			sym->str = elf.ptr + swap64(elf.shdr[swap32(elf.shdr[i].sh_link, elf.endian)].sh_offset, elf.endian);
 			return (1);
 		}
 	}
@@ -25,13 +25,15 @@ t_symbol	*filter_64sym(t_64elf elf, t_64sym sym)
 	int			ttype;
 	t_symbol	*symbol;
 
-	str = elf.ptr + elf.shdr[elf.ehdr.e_shstrndx].sh_offset;
+	str = elf.ptr + swap64(elf.shdr[swap16(elf.ehdr.e_shstrndx, elf.endian)].sh_offset, elf.endian);
 	symbol = ft_memalloc(sizeof(t_symbol) * (sym.size + 1));
 	for (int y = 0; y < sym.size; y++)
 	{
 		ttype = ELF64_ST_TYPE(sym.sym[y].st_info);
 		if (ttype == STT_FUNC || ttype == STT_OBJECT || ttype == STT_NOTYPE)
-			addsym(symbol, sym.str + sym.sym[y].st_name, symbol64(str, sym.sym[y], elf.shdr), sym.sym[y].st_value);
+			addsym(symbol, sym.str + swap32(sym.sym[y].st_name, elf.endian),
+				symbol64(str, sym.sym[y], elf.shdr),
+				swap64(sym.sym[y].st_value, elf.endian));
 	}
 	return (symbol);
 }
@@ -58,9 +60,12 @@ void	elf64(char *ptr, size_t size, char *file)
 	t_64sym		sym;
 	t_symbol	*symbol;
 
+	elf.endian = ptr[EI_DATA];
 	ft_memcpy(&elf.ehdr, ptr, sizeof(Elf64_Ehdr));
-	ft_memcpy(&elf.phdr, ptr + elf.ehdr.e_phoff, sizeof(Elf64_Phdr));
-	elf.shdr = (Elf64_Shdr*)(ptr + elf.ehdr.e_shoff);
+	if (swap64(elf.ehdr.e_phoff, elf.endian) > size || swap64(elf.ehdr.e_shoff, elf.endian) > size)
+		return ;
+	ft_memcpy(&elf.phdr, ptr + swap64(elf.ehdr.e_phoff, elf.endian), sizeof(Elf64_Phdr));
+	elf.shdr = (Elf64_Shdr*)(ptr + swap64(elf.ehdr.e_shoff, elf.endian));
 	elf.ptr = ptr;
 	elf.size = size;
 	if (!get_sym(&sym, elf))
