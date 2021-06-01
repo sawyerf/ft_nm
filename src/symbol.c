@@ -1,18 +1,16 @@
 #include "libft.h"
 #include "ft_nm.h"
 
-char	symbol64(char *str, Elf64_Sym sym, Elf64_Shdr *shdr)
+char	symbol64(Elf64_Sym sym, Elf64_Shdr *shdr, t_64elf elf)
 {
 	char			c;
 	Elf64_Word		sh_type;
 	Elf64_Xword		sh_flag;
 	unsigned char	st_bind;
 	unsigned char	st_type;
-	int		bind;
 	
-	(void)str;
-	sh_type = shdr[sym.st_shndx].sh_type;
-	sh_flag = shdr[sym.st_shndx].sh_flags;
+	sh_type = swap32(shdr[swap16(sym.st_shndx, elf.endian)].sh_type,  elf.endian);
+	sh_flag = swap64(shdr[swap16(sym.st_shndx, elf.endian)].sh_flags, elf.endian);
 	st_bind = ELF64_ST_BIND(sym.st_info);
 	st_type = ELF64_ST_TYPE(sym.st_info);
 	if (st_bind == STB_GNU_UNIQUE)
@@ -59,7 +57,7 @@ char	symbol64(char *str, Elf64_Sym sym, Elf64_Shdr *shdr)
 	return c;
 }
 
-char	symbol32(char *str, Elf32_Sym sym, Elf32_Shdr *shdr)
+char	symbol32(Elf32_Sym sym, Elf32_Shdr *shdr, t_32elf elf)
 {
 	char	c;
 	Elf32_Word		sh_type;
@@ -67,11 +65,10 @@ char	symbol32(char *str, Elf32_Sym sym, Elf32_Shdr *shdr)
 	unsigned char	st_bind;
 	unsigned char	st_type;
 	
-	(void)str;
-	sh_type = shdr[sym.st_shndx].sh_type;
+	sh_type = swap32(shdr[swap16(sym.st_shndx, elf.endian)].sh_type,  elf.endian);
+	sh_flag = swap32(shdr[swap16(sym.st_shndx, elf.endian)].sh_flags, elf.endian);
 	st_bind = ELF32_ST_BIND(sym.st_info);
 	st_type = ELF32_ST_TYPE(sym.st_info);
-	sh_flag = shdr[sym.st_shndx].sh_flags;
 	if (st_bind == STB_GNU_UNIQUE)
 		c = 'u';
 	else if (st_bind == STB_WEAK &&

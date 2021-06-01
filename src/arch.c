@@ -30,12 +30,17 @@ void	arch(char *ptr, size_t size)
 	ptr += SARMAG + sizeof(arc) + ft_atoi(arc.ar_size);
 	size -= SARMAG + sizeof(arc) + ft_atoi(arc.ar_size);
 	func = NULL;
-	while (size > 1)
+	while (size >= sizeof(arc))
 	{
 		ft_memcpy(&arc, ptr, sizeof(arc));
 		ptr += sizeof(arc);
-		class = amagic(ptr);
+		if (size < ft_atoi(arc.ar_size) + sizeof(arc))
+		{
+			dprintf(2, "ft_nm: %s: file truncated\n", "");
+			return ;
+		}
 		size -= ft_atoi(arc.ar_size) + sizeof(arc);
+		class = amagic(ptr);
 		if (class == ELF32 || class == ELF64)
 			filename(arc.ar_name, func);
 		if (class == ELF32)

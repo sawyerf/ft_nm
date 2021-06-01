@@ -10,14 +10,16 @@ int			sortcomp(char *s1, char *s2)
 	y = 0;
 	while (s1[i] && s2[y])
 	{
-		while (!ft_isalnum(s1[i]) && s1[i + 1])
+		while (!ft_isalnum(s1[i]) && s1[i])
 			i++;
-		while (!ft_isalnum(s2[y]) && s2[y + 1])
+		while (!ft_isalnum(s2[y]) && s2[y])
 			y++;
 		if (ft_toupper(s1[i]) != ft_toupper(s2[y]))
 			return (ft_toupper(s2[y]) - ft_toupper(s1[i]));
-		i++;
-		y++;
+		if (s1[i])
+			i++;
+		if (s2[y])
+			y++;
 	}
 	if (!(ft_toupper(s1[i]) != ft_toupper(s2[y])))
 		return (-1 * ft_strcmp(s1, s2));

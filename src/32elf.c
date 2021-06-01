@@ -21,17 +21,18 @@ int			get_32sym(t_32sym *sym, t_32elf elf)
 
 t_symbol	*filter_32sym(t_32elf elf, t_32sym sym)
 {
-	char		*str;
 	int			ttype;
 	t_symbol	*symbol;
 
 	symbol = ft_memalloc(sizeof(t_symbol) * (sym.size + 1));
-	str = elf.ptr + swap32(elf.shdr[swap16(elf.ehdr.e_shstrndx, elf.endian)].sh_offset, elf.endian);
 	for (int y = 0; y < sym.size; y++)
 	{
 		ttype = ELF32_ST_TYPE(sym.sym[y].st_info);
 		if (ttype == STT_FUNC || ttype == STT_OBJECT || ttype == STT_NOTYPE)
-			addsym(symbol, sym.str + swap32(sym.sym[y].st_name, elf.endian), symbol32(str, sym.sym[y], elf.shdr), swap32(sym.sym[y].st_value, elf.endian));
+			addsym(symbol,
+				sym.str + swap32(sym.sym[y].st_name, elf.endian),
+				symbol32(sym.sym[y], elf.shdr, elf),
+				swap32(sym.sym[y].st_value, elf.endian));
 	}
 	return (symbol);
 }
@@ -60,8 +61,13 @@ void	elf32(char *ptr, size_t size, char *file)
 
 	elf.endian = ptr[EI_DATA];
 	ft_memcpy(&elf.ehdr, ptr, sizeof(Elf32_Ehdr));
-	if (swap32(elf.ehdr.e_phoff, elf.endian) > size || swap32(elf.ehdr.e_shoff, elf.endian) > size)
+	if (swap32(elf.ehdr.e_phoff, elf.endian) > size ||
+		swap32(elf.ehdr.e_shoff, elf.endian) + (swap16(elf.ehdr.e_shnum, elf.endian) * sizeof(Elf32_Shdr)) > size)
+	{
+		
+		dprintf(2, "ft_nm: %s: file truncated\n", file);
 		return ;
+	}
  	ft_memcpy(&elf.phdr, ptr + swap32(elf.ehdr.e_phoff, elf.endian), sizeof(Elf32_Phdr));
 	elf.shdr = (Elf32_Shdr*)(ptr + swap32(elf.ehdr.e_shoff, elf.endian));
 	elf.ptr = ptr;

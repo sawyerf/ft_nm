@@ -54,8 +54,8 @@ typedef struct	s_symbol
 	long int	addr;
 }				t_symbol;
 
-char			symbol64(char *str, Elf64_Sym sym, Elf64_Shdr *shdr);
-char			symbol32(char *str, Elf32_Sym sym, Elf32_Shdr *shdr);
+char			symbol64(Elf64_Sym sym, Elf64_Shdr *shdr, t_64elf elf);
+char			symbol32(Elf32_Sym sym, Elf32_Shdr *shdr, t_32elf elf);
 void			elf64(char *ptr, size_t size, char *file);
 void			elf32(char *ptr, size_t size, char *file);
 void			arch (char *ptr, size_t size);
