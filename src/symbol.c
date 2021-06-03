@@ -5,19 +5,18 @@ char	symbol64b(Elf64_Sym sym, Elf64_Shdr *shdr, t_64elf elf)
 {
 	Elf64_Word		sh_type;
 	Elf64_Xword		sh_flag;
-	char			c;
 
-	sh_type = swap32(shdr[swap16(sym.st_shndx, elf.endian)].sh_type,  elf.endian);
-	sh_flag = swap64(shdr[swap16(sym.st_shndx, elf.endian)].sh_flags, elf.endian);
 	if (sym.st_shndx == SHN_UNDEF)
 		return ('U');
 	else if (sym.st_shndx == SHN_ABS)
 		return ('A');
 	else if (sym.st_shndx == SHN_COMMON)
 		return ('C');
-	else if (sh_type == SHT_NOBITS)
+	sh_type = swap32(shdr[swap16(sym.st_shndx, elf.endian)].sh_type,  elf.endian);
+	if (sh_type == SHT_NOBITS)
 		return ('B');
-	else if ((sh_type == SHT_PROGBITS && sh_flag == (SHF_ALLOC | SHF_MERGE)) ||
+	sh_flag = swap64(shdr[swap16(sym.st_shndx, elf.endian)].sh_flags, elf.endian);
+	if ((sh_type == SHT_PROGBITS && sh_flag == (SHF_ALLOC | SHF_MERGE)) ||
 		(sh_type == SHT_PROGBITS && sh_flag == (SHF_ALLOC)))
 		return ('R');
 	else if ((sh_type == SHT_PROGBITS && sh_flag == (SHF_ALLOC | SHF_WRITE)) ||
@@ -40,7 +39,7 @@ char	symbol64(Elf64_Sym sym, Elf64_Shdr *shdr, t_64elf elf)
 	st_type = ELF64_ST_TYPE(sym.st_info);
 	if (st_bind == STB_GNU_UNIQUE)
 		c = 'u';
-	else if (st_bind == STB_WEAK & sym.st_shndx == SHN_UNDEF)
+	else if (st_bind == STB_WEAK && sym.st_shndx == SHN_UNDEF)
 		c = 'w';
 	else if (st_bind == STB_WEAK)
 		c = 'W';
@@ -52,7 +51,7 @@ char	symbol64(Elf64_Sym sym, Elf64_Shdr *shdr, t_64elf elf)
 			c = 'v';
 	}
 	else
-		c = symbol32b(sym, shdr, elf);
+		c = symbol64b(sym, shdr, elf);
 	if (st_bind == STB_LOCAL && c != '?')
 		c += 32;
 	return c;
@@ -62,22 +61,21 @@ char	symbol32b(Elf32_Sym sym, Elf32_Shdr *shdr, t_32elf elf)
 {
 	Elf32_Word		sh_type;
 	Elf32_Word		sh_flag;
-	char			c;
 
-	sh_type = swap32(shdr[swap16(sym.st_shndx, elf.endian)].sh_type,  elf.endian);
-	sh_flag = swap32(shdr[swap16(sym.st_shndx, elf.endian)].sh_flags, elf.endian);
 	if (sym.st_shndx == SHN_UNDEF)
 		return ('U');
 	else if (sym.st_shndx == SHN_ABS)
 		return ('A');
 	else if (sym.st_shndx == SHN_COMMON)
 		return ('C');
-	else if (sh_type == SHT_NOBITS)
+	sh_type = swap32(shdr[swap16(sym.st_shndx, elf.endian)].sh_type,  elf.endian);
+	if (sh_type == SHT_NOBITS)
 		return ('B');
-	else if ((sh_type == SHT_PROGBITS && sh_flag == (SHF_ALLOC | SHF_MERGE)) ||
+	sh_flag = swap32(shdr[swap16(sym.st_shndx, elf.endian)].sh_flags, elf.endian);
+	if ((sh_type == SHT_PROGBITS && sh_flag == (SHF_ALLOC | SHF_MERGE)) ||
 		(sh_type == SHT_PROGBITS && sh_flag == (SHF_ALLOC)))
 		return ('R');
-	else if (sh_type == SHT_PROGBITS && sh_flag == (SHF_ALLOC | SHF_WRITE) ||
+	else if ((sh_type == SHT_PROGBITS && sh_flag == (SHF_ALLOC | SHF_WRITE)) ||
 		(sh_type == SHT_DYNAMIC))
 		return ('D');
 	else if ((sh_type == SHT_PROGBITS) || (sh_type == SHT_INIT_ARRAY) ||
@@ -104,7 +102,7 @@ char	symbol32(Elf32_Sym sym, Elf32_Shdr *shdr, t_32elf elf)
 		if (sym.st_shndx == SHN_UNDEF)
 			c = 'v';
 	}
-	else if (st_bind == STB_WEAK & sym.st_shndx == SHN_UNDEF)
+	else if (st_bind == STB_WEAK && sym.st_shndx == SHN_UNDEF)
 		c = 'w';
 	else if (st_bind == STB_WEAK)
 		c = 'W';
