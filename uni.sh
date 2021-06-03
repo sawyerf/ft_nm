@@ -1,2 +1,2 @@
-./ft_nm $1 > lol; nm $1 > lol2; diff lol lol2
-valgrind ./ft_nm $1 1>&-
+./ft_nm $* > lol; nm $* > lol2; diff lol lol2
+valgrind ./ft_nm $* 1>&-

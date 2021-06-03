@@ -5,7 +5,8 @@ int		get_sym(t_64sym *sym, t_64elf elf)
 {
 	int			len;
 
-	len = (elf.size - swap64(elf.ehdr.e_shoff, elf.endian)) / sizeof(Elf64_Shdr);
+	len = (elf.size - swap64(elf.ehdr.e_shoff, elf.endian)) /
+		sizeof(Elf64_Shdr);
 	for (int i = 0; i < len; i++)
 	{
 		if (swap64(elf.shdr[i].sh_type, elf.endian) == SHT_SYMTAB)
@@ -29,7 +30,8 @@ t_symbol	*filter_64sym(t_64elf elf, t_64sym sym)
 	{
 		ttype = ELF64_ST_TYPE(sym.sym[y].st_info);
 		if (ttype == STT_FUNC || ttype == STT_OBJECT || ttype == STT_NOTYPE)
-			addsym(symbol, sym.str + swap32(sym.sym[y].st_name, elf.endian),
+			addsym(symbol,
+				sym.str + swap32(sym.sym[y].st_name, elf.endian),
 				symbol64(sym.sym[y], elf.shdr, elf),
 				swap64(sym.sym[y].st_value, elf.endian));
 	}
@@ -60,13 +62,12 @@ void	elf64(char *ptr, size_t size, char *file)
 
 	elf.endian = ptr[EI_DATA];
 	ft_memcpy(&elf.ehdr, ptr, sizeof(Elf64_Ehdr));
-	if (swap32(elf.ehdr.e_phoff, elf.endian) > size ||
-		swap64(elf.ehdr.e_shoff, elf.endian) + (swap16(elf.ehdr.e_shnum, elf.endian) * sizeof(Elf64_Shdr)) > size)
+	if (swap64(elf.ehdr.e_shoff, elf.endian) +
+		(swap16(elf.ehdr.e_shnum, elf.endian) * sizeof(Elf64_Shdr)) > size)
 	{
 		dprintf(2, "ft_nm: %s: file truncated\n", file);
 		return ;
 	}
-	ft_memcpy(&elf.phdr, ptr + swap64(elf.ehdr.e_phoff, elf.endian), sizeof(Elf64_Phdr));
 	elf.shdr = (Elf64_Shdr*)(ptr + swap64(elf.ehdr.e_shoff, elf.endian));
 	elf.ptr = ptr;
 	elf.size = size;
