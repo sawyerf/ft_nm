@@ -1,20 +1,20 @@
 #include "libft.h"
 #include "ft_nm.h"
 
-int			get_32sym(t_32sym *sym, t_32elf elf)
+int	get_32sym(t_32sym *sym, t_32elf elf)
 {
 	int			len;
 
-	len = (elf.size - swap32(elf.ehdr.e_shoff, elf.endian)) /
-		sizeof(Elf32_Shdr);
+	len = (elf.size - swap32(elf.ehdr.e_shoff, elf.endian))
+		/ sizeof(Elf32_Shdr);
 	for (int i = 0; i < len; i++)
 	{
 		if (swap32(elf.shdr[i].sh_type, elf.endian) == SHT_SYMTAB)
 		{
-			sym->sym = (Elf32_Sym*)(elf.ptr +
-				swap32(elf.shdr[i].sh_offset, elf.endian));
-			sym->size = swap32(elf.shdr[i].sh_size, elf.endian) /
-				sizeof(Elf32_Sym);
+			sym->sym = (Elf32_Sym*)(elf.ptr
+				+ swap32(elf.shdr[i].sh_offset, elf.endian));
+			sym->size = swap32(elf.shdr[i].sh_size, elf.endian)
+				/ sizeof(Elf32_Sym);
 			sym->str = elf.ptr + swap32(elf.shdr[swap32(elf.shdr[i].sh_link,
 				elf.endian)].sh_offset, elf.endian);
 			return (1);
@@ -41,11 +41,11 @@ t_symbol	*filter_32sym(t_32elf elf, t_32sym sym)
 	return (symbol);
 }
 
-void		print_32sym(t_symbol *symbol, char *file)
+void	print_32sym(t_symbol *symbol, char *file)
 {
 	if (!symbol[0].name)
 	{
-		dprintf(2, "ft_nm: %s: aucun symbole\n", file);
+		dprintf(2, "ft_nm: %s: no symbols\n", file);
 		return ;
 	}
 	for (int y = 0; symbol[y].name; y++)
@@ -65,8 +65,8 @@ void	elf32(char *ptr, size_t size, char *file)
 
 	elf.endian = ptr[EI_DATA];
 	ft_memcpy(&elf.ehdr, ptr, sizeof(Elf32_Ehdr));
-	if (swap32(elf.ehdr.e_shoff, elf.endian) +
-		(swap16(elf.ehdr.e_shnum, elf.endian) * sizeof(Elf32_Shdr)) > size)
+	if (swap32(elf.ehdr.e_shoff, elf.endian)
+		+ (swap16(elf.ehdr.e_shnum, elf.endian) * sizeof(Elf32_Shdr)) > size)
 	{
 		dprintf(2, "ft_nm: %s: file truncated\n", file);
 		return ;
@@ -76,7 +76,7 @@ void	elf32(char *ptr, size_t size, char *file)
 	elf.size = size;
 	if (!get_32sym(&sym, elf))
 	{
-		dprintf(2, "ft_nm: %s: aucun symbole\n", file);
+		dprintf(2, "ft_nm: %s: no symbols\n", file);
 		return ;
 	}
 	symbol = filter_32sym(elf, sym);

@@ -13,7 +13,7 @@ void	filename(char *name, char *funcs)
 		i++;
 	if (!i && funcs)
 		filename(funcs + ft_atoi(name + 1), NULL);
-	else if (i) // && !ft_strncmp("/               ", name, 16))
+	else if (i)
 	{
 		cpy = ft_fstrndup(name, i);
 		printf("\n%s:\n", cpy);
@@ -28,8 +28,6 @@ void	arch(char *ptr, size_t size)
 	char			*func;
 
 	ft_memcpy(&arc, ptr + SARMAG, sizeof(arc));
-	// ptr += SARMAG + sizeof(arc) + ft_atoi(arc.ar_size);
-	// size -= SARMAG + sizeof(arc) + ft_atoi(arc.ar_size);
 	ptr += SARMAG;
 	size -= SARMAG;
 	func = NULL;
@@ -43,7 +41,7 @@ void	arch(char *ptr, size_t size)
 			return ;
 		}
 		size -= ft_atoi(arc.ar_size) + sizeof(arc);
-		class = amagic(ptr);
+		class = amagic(ptr, ft_atoi(arc.ar_size));
 		if (class == ELF32 || class == ELF64)
 			filename(arc.ar_name, func);
 		if (class == ELF32)

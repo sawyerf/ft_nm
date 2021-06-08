@@ -11,12 +11,12 @@ char	*readf(char *file, struct stat *st)
 
 	if ((fd = open(file, O_RDONLY)) < 0)
 	{
-		dprintf(2, "ft_nm: Open error\n");
+		dprintf(2, "ft_nm: %s: Open error\n", file);
 		return (NULL);
 	}
 	if (fstat(fd, st) < 0)
 	{
-		dprintf(2, "ft_nm: Fstat error\n");
+		dprintf(2, "ft_nm: %s: Fstat error\n", file);
 		return (NULL);
 	}
 	if ((st->st_mode & S_IFMT) == S_IFDIR)
@@ -26,13 +26,15 @@ char	*readf(char *file, struct stat *st)
 	}
 	ptr = mmap(NULL, st->st_size, PROT_READ, MAP_PRIVATE, fd, 0);
 	close(fd);
-	return ptr;
+	return (ptr);
 }
 
-int		amagic(char *ptr)
+int	amagic(char *ptr, size_t size)
 {
-	if (!ft_strncmp(ptr, ARMAG, SARMAG))
+	if (size > SARMAG && !ft_strncmp(ptr, ARMAG, SARMAG))
 		return (ARCH);
+	if (size < EI_CLASS)
+		return (INVCL);
 	if (ft_strncmp(ptr, ELFMAG, SELFMAG))
 		return (NOTELF);
 	if (ptr[EI_CLASS] == ELFCLASS32)
@@ -43,7 +45,7 @@ int		amagic(char *ptr)
 		return (INVCL);
 }
 
-int main(int argi, char **argv)
+int	main(int argi, char **argv)
 {
 	char	*ptr;
 	struct stat st;
@@ -53,9 +55,9 @@ int main(int argi, char **argv)
 	for (int i = 1; argv[i]; i++)
 	{
 		if (!(ptr = readf(argv[i], &st)))
-			continue;
-		class = amagic(ptr);
-		if (argi > 2)
+			continue ;
+		class = amagic(ptr, st.st_size);
+		if (class > ISERR && argi > 2)
 			printf("\n%s:\n", argv[i]);
 		if (class == ELF32)
 			elf32(ptr, st.st_size, argv[i]);

@@ -1,12 +1,12 @@
 #include "libft.h"
 #include "ft_nm.h"
 
-int		get_sym(t_64sym *sym, t_64elf elf)
+int	get_sym(t_64sym *sym, t_64elf elf)
 {
 	int			len;
 
-	len = (elf.size - swap64(elf.ehdr.e_shoff, elf.endian)) /
-		sizeof(Elf64_Shdr);
+	len = (elf.size - swap64(elf.ehdr.e_shoff, elf.endian))
+		/ sizeof(Elf64_Shdr);
 	for (int i = 0; i < len; i++)
 	{
 		if (swap64(elf.shdr[i].sh_type, elf.endian) == SHT_SYMTAB)
@@ -42,7 +42,7 @@ void	print_64sym(t_symbol *symbol, char *file)
 {
 	if (!symbol[0].name)
 	{
-		dprintf(2, "ft_nm: %s: aucun symbole\n", file);
+		dprintf(2, "ft_nm: %s: no symbols\n", file);
 		return ;
 	}
 	for (int y = 0; symbol[y].name; y++)
@@ -62,8 +62,8 @@ void	elf64(char *ptr, size_t size, char *file)
 
 	elf.endian = ptr[EI_DATA];
 	ft_memcpy(&elf.ehdr, ptr, sizeof(Elf64_Ehdr));
-	if (swap64(elf.ehdr.e_shoff, elf.endian) +
-		(swap16(elf.ehdr.e_shnum, elf.endian) * sizeof(Elf64_Shdr)) > size)
+	if (swap64(elf.ehdr.e_shoff, elf.endian)
+		+ (swap16(elf.ehdr.e_shnum, elf.endian) * sizeof(Elf64_Shdr)) > size)
 	{
 		dprintf(2, "ft_nm: %s: file truncated\n", file);
 		return ;
@@ -73,7 +73,7 @@ void	elf64(char *ptr, size_t size, char *file)
 	elf.size = size;
 	if (!get_sym(&sym, elf))
 	{
-		dprintf(2, "ft_nm: %s: aucun symbole\n", file);
+		dprintf(2, "ft_nm: %s: no symbols\n", file);
 		return ;
 	}
 	symbol = filter_64sym(elf, sym);

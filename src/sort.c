@@ -1,10 +1,10 @@
 #include "libft.h"
 #include "ft_nm.h"
 
-int			sortcomp(char *s1, char *s2)
+int	sortcomp(char *s1, char *s2)
 {
 	int	i;
-	int y;
+	int	y;
 
 	i = 0;
 	y = 0;
@@ -39,7 +39,7 @@ t_symbol	*decal(t_symbol *sym)
 	t_symbol	cpy0;
 	t_symbol	cpy1;
 	int			i;
-	
+
 	ft_memset(&cpy0, 0, sizeof(t_symbol));
 	ft_memset(&cpy1, 0, sizeof(t_symbol));
 	cpy0 = symcpy(cpy0, sym[0]);
@@ -57,10 +57,10 @@ t_symbol	*decal(t_symbol *sym)
 t_symbol	*addsym(t_symbol *sym, char *name, char symbol, long int addr)
 {
 	int		i;
-	
+
 	i = 0;
 	if (!name[0])
-		return sym;
+		return (sym);
 	while (sym[i].name)
 	{
 		if (sortcomp(sym[i].name, name) < 0)
@@ -69,12 +69,12 @@ t_symbol	*addsym(t_symbol *sym, char *name, char symbol, long int addr)
 			sym[i].name = name;
 			sym[i].symbol = symbol;
 			sym[i].addr = addr;
-			return sym;
+			return (sym);
 		}
 		i++;
 	}
 	sym[i].name = name;
 	sym[i].symbol = symbol;
 	sym[i].addr = addr;
-	return sym;
+	return (sym);
 }

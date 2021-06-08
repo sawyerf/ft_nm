@@ -7,8 +7,9 @@
 #include "libft.h"
 #include <stdio.h>
 
-# define NOTELF	0
-# define INVCL	1
+# define INVCL	-2
+# define NOTELF	-1
+# define ISERR	0
 # define ARCH	3
 # define ELF32	32
 # define ELF64	64
@@ -60,7 +61,7 @@ void			elf64(char *ptr, size_t size, char *file);
 void			elf32(char *ptr, size_t size, char *file);
 void			arch (char *ptr, size_t size);
 t_symbol		*addsym(t_symbol *sym, char *name, char symbol, long int addr);
-int				amagic(char *ptr);
+int				amagic(char *ptr, size_t size);
 uint64_t		swap64(uint64_t nbr, char endian);
 uint32_t		swap32(uint32_t nbr, char endian);
 uint16_t		swap16(uint16_t nbr, char endian);
