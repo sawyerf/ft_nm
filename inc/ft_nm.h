@@ -1,11 +1,11 @@
 #ifndef FT_NM_H
 # define FT_NM_H
 
-#include <stdlib.h>
-#include <elf.h>
-#include <sys/stat.h>
-#include "libft.h"
-#include <stdio.h>
+# include <stdlib.h>
+# include <elf.h>
+# include <sys/stat.h>
+# include "libft.h"
+# include <stdio.h>
 
 # define INVCL	-2
 # define NOTELF	-1
@@ -14,7 +14,7 @@
 # define ELF32	32
 # define ELF64	64
 
-typedef struct	s_64elf
+typedef struct s_64elf
 {
 	Elf64_Ehdr	ehdr;
 	Elf64_Phdr	phdr;
@@ -24,7 +24,7 @@ typedef struct	s_64elf
 	char		endian;
 }				t_64elf;
 
-typedef struct	s_32elf
+typedef struct s_32elf
 {
 	Elf32_Ehdr	ehdr;
 	Elf32_Phdr	phdr;
@@ -34,21 +34,21 @@ typedef struct	s_32elf
 	char		endian;
 }				t_32elf;
 
-typedef struct	s_64sym
+typedef struct s_64sym
 {
 	Elf64_Sym	*sym;
 	int			size;
 	char		*str;
 }				t_64sym;
 
-typedef struct	s_32sym
+typedef struct s_32sym
 {
 	Elf32_Sym	*sym;
 	int			size;
 	char		*str;
 }				t_32sym;
 
-typedef struct	s_symbol
+typedef struct s_symbol
 {
 	char		*name;
 	char		symbol;

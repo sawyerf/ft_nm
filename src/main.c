@@ -56,6 +56,7 @@ int	main(int argi, char **argv)
 	{
 		if (!(ptr = readf(argv[i], &st)))
 			continue ;
+		//printf("file: %s\n", argv[i]);
 		class = amagic(ptr, st.st_size);
 		if (class > ISERR && argi > 2)
 			printf("\n%s:\n", argv[i]);
@@ -66,6 +67,6 @@ int	main(int argi, char **argv)
 		else if (class == ARCH)
 			arch(ptr, st.st_size);
 		else if (class == NOTELF)
-			dprintf(2, "ft_nm: %s: file format not recognized\n", argv[1]);
+			dprintf(2, "ft_nm: %s: file format not recognized\n", argv[i]);
 	}
 }

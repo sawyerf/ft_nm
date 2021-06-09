@@ -3,7 +3,7 @@
 #include "libft.h"
 #include "ft_nm.h"
 
-void	filename(char *name, char *funcs)
+void	filename(char *name, char *funcs, int err)
 {
 	char	*cpy;
 	int		i;
@@ -12,11 +12,14 @@ void	filename(char *name, char *funcs)
 	while (name[i] != '/')
 		i++;
 	if (!i && funcs)
-		filename(funcs + ft_atoi(name + 1), NULL);
+		filename(funcs + ft_atoi(name + 1), NULL, err);
 	else if (i)
 	{
 		cpy = ft_fstrndup(name, i);
-		printf("\n%s:\n", cpy);
+		if (!err)
+			printf("\n%s:\n", cpy);
+		else
+			dprintf(2, "ft_nm: %s: file truncated\n", cpy);
 		free(cpy);
 	}
 }
@@ -37,13 +40,13 @@ void	arch(char *ptr, size_t size)
 		ptr += sizeof(arc);
 		if (size < ft_atoi(arc.ar_size) + sizeof(arc))
 		{
-			dprintf(2, "ft_nm: %s: file truncated\n", "");
+			filename(arc.ar_name, func, 1);
 			return ;
 		}
 		size -= ft_atoi(arc.ar_size) + sizeof(arc);
 		class = amagic(ptr, ft_atoi(arc.ar_size));
 		if (class == ELF32 || class == ELF64)
-			filename(arc.ar_name, func);
+			filename(arc.ar_name, func, 0);
 		if (class == ELF32)
 			elf32(ptr, ft_atoi(arc.ar_size), "");
 		else if (class == ELF64)

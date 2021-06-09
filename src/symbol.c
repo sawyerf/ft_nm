@@ -67,7 +67,7 @@ char	symbol32b(Elf32_Sym sym, Elf32_Shdr *shdr, t_32elf elf)
 		return ('A');
 	else if (sym.st_shndx == SHN_COMMON)
 		return ('C');
-	sh_type = swap32(shdr[swap16(sym.st_shndx, elf.endian)].sh_type,  elf.endian);
+	sh_type = swap32(shdr[swap16(sym.st_shndx, elf.endian)].sh_type, elf.endian);
 	if (sh_type == SHT_NOBITS)
 		return ('B');
 	sh_flag = swap32(shdr[swap16(sym.st_shndx, elf.endian)].sh_flags, elf.endian);
