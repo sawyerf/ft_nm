@@ -17,9 +17,9 @@ void	filename(char *name, char *funcs, int err)
 	{
 		cpy = ft_fstrndup(name, i);
 		if (!err)
-			printf("\n%s:\n", cpy);
+			ft_printf("\n%s:\n", cpy);
 		else
-			dprintf(2, "ft_nm: %s: file truncated\n", cpy);
+			ft_dprintf(2, "ft_nm: %s: file truncated\n", cpy);
 		free(cpy);
 	}
 }

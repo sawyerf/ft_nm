@@ -11,17 +11,17 @@ char	*readf(char *file, struct stat *st)
 
 	if ((fd = open(file, O_RDONLY)) < 0)
 	{
-		dprintf(2, "ft_nm: %s: Open error\n", file);
+		ft_dprintf(2, "ft_nm: %s: Open error\n", file);
 		return (NULL);
 	}
 	if (fstat(fd, st) < 0)
 	{
-		dprintf(2, "ft_nm: %s: Fstat error\n", file);
+		ft_dprintf(2, "ft_nm: %s: Fstat error\n", file);
 		return (NULL);
 	}
 	if ((st->st_mode & S_IFMT) == S_IFDIR)
 	{
-		dprintf(2, "ft_nm: Attention : « %s » est un répertoire\n", file);
+		ft_dprintf(2, "ft_nm: Attention : « %s » est un répertoire\n", file);
 		return (NULL);
 	}
 	ptr = mmap(NULL, st->st_size, PROT_READ, MAP_PRIVATE, fd, 0);
@@ -56,10 +56,9 @@ int	main(int argi, char **argv)
 	{
 		if (!(ptr = readf(argv[i], &st)))
 			continue ;
-		//printf("file: %s\n", argv[i]);
 		class = amagic(ptr, st.st_size);
 		if (class > ISERR && argi > 2)
-			printf("\n%s:\n", argv[i]);
+			ft_printf("\n%s:\n", argv[i]);
 		if (class == ELF32)
 			elf32(ptr, st.st_size, argv[i]);
 		else if (class == ELF64)
@@ -67,6 +66,6 @@ int	main(int argi, char **argv)
 		else if (class == ARCH)
 			arch(ptr, st.st_size);
 		else if (class == NOTELF)
-			dprintf(2, "ft_nm: %s: file format not recognized\n", argv[i]);
+			ft_dprintf(2, "ft_nm: %s: file format not recognized\n", argv[i]);
 	}
 }

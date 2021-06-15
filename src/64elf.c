@@ -42,15 +42,15 @@ void	print_64sym(t_symbol *symbol, char *file)
 {
 	if (!symbol[0].name)
 	{
-		dprintf(2, "ft_nm: %s: no symbols\n", file);
+		ft_dprintf(2, "ft_nm: %s: no symbols\n", file);
 		return ;
 	}
 	for (int y = 0; symbol[y].name; y++)
 	{
 		if (symbol[y].symbol != 'U' && symbol[y].symbol != 'w' && symbol[y].symbol != 'v')
-			printf("%016lx %c %s\n", symbol[y].addr, symbol[y].symbol, symbol[y].name);
+			ft_printf("%016lx %c %s\n", symbol[y].addr, symbol[y].symbol, symbol[y].name);
 		else
-			printf("%16c %c %s\n", ' ', symbol[y].symbol, symbol[y].name);
+			ft_printf("%16c %c %s\n", ' ', symbol[y].symbol, symbol[y].name);
 	}
 }
 
@@ -65,7 +65,7 @@ void	elf64(char *ptr, size_t size, char *file)
 	if (swap64(elf.ehdr.e_shoff, elf.endian)
 		+ (swap16(elf.ehdr.e_shnum, elf.endian) * sizeof(Elf64_Shdr)) > size)
 	{
-		dprintf(2, "ft_nm: %s: file truncated\n", file);
+		ft_dprintf(2, "ft_nm: %s: file truncated\n", file);
 		return ;
 	}
 	elf.shdr = (Elf64_Shdr*)(ptr + swap64(elf.ehdr.e_shoff, elf.endian));
@@ -73,7 +73,7 @@ void	elf64(char *ptr, size_t size, char *file)
 	elf.size = size;
 	if (!get_sym(&sym, elf))
 	{
-		dprintf(2, "ft_nm: %s: no symbols\n", file);
+		ft_dprintf(2, "ft_nm: %s: no symbols\n", file);
 		return ;
 	}
 	symbol = filter_64sym(elf, sym);
